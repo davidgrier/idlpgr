@@ -23,15 +23,19 @@ To use this package, make sure that your `IDL_PATH` includes
 This package is written and maintained by David G. Grier
 (david.grier@nyu.edu)
 
-INSTALLATION
+## INSTALLATION
+
 Requires the FlyCapture2 API to be installed, a working
-installation of IDL, and administrator (sudo) authorization.
+installation of IDL, and administrator (sudo) priviledges.
+
 1. unpack the distribution in a convenient directory.
 2. `cd idlpgr`
 3. `make`
 4. `make install`
 
-UNINSTALLATION
-Requires administrator (sudo) authorization.
+## UNINSTALLATION
+
+Requires administrator (sudo) priviledges.
+
 1. `cd idlpgr`
 2. `make uninstall`
