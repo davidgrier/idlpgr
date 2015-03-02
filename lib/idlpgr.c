@@ -32,10 +32,11 @@ fc2Image   image;
 
 // Error messages
 static IDL_MSG_DEF msg_arr[] =
+  {
 #define M_IDLPGR_NOERROR  0
-  { "M_IDLPGR_NOERROR", "%NNo errors."},
-#define M_IDLPGR_NOERROR -1
-  { "M_IDLPGR_NOCONTEXT", "%NCould not create context."}.
+    { "M_IDLPGR_NOERROR", "%NNo errors." },
+#define M_IDLPGR_NOCONTEXT -1
+    { "M_IDLPGR_NOCONTEXT", "%NCould not create context." },
   };
 
 static IDL_MSG_BLOCK msg_block;
