@@ -11,8 +11,9 @@
 // 07/19/2013 Written by David G. Grier, New York University
 // 01/24/2014 DGG Implemented read_register.
 // 01/26/2014 DGG Implemented write_register, read_property & write_property
+// 03/02/2015 DGG Better integration of FlyCap2 API with IDL.
 //
-// Copyright (c) 2013-2014 David G. Grier
+// Copyright (c) 2013-2015 David G. Grier
 //
 #include <stdio.h>
 #include <math.h>
@@ -29,6 +30,32 @@ fc2Context context;
 fc2PGRGuid guid;
 fc2Image   image;
 
+// Error messages
+static IDL_MSG_DEF msg_arr[] =
+#define M_IDLPGR_NOERROR  0
+  { "M_IDLPGR_NOERROR", "%NNo errors."},
+#define M_IDLPGR_NOERROR -1
+  { "M_IDLPGR_NOCONTEXT", "%NCould not create context."}.
+  };
+
+static IDL_MSG_BLOCK msg_block;
+
+//
+// idlpgr_CreateContext
+//
+IDL_VPTR idlpgr_CreateContext(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+
+  error = fc2CreateContext(&context);
+  if (error) {
+    IDL_MESSAGE(M_IDLPGR_NOCONTEXT, IDL_MSG_LONGJMP);
+  }
+
+  return IDL_GettmpLong(1);
+}
+
 //
 // OPEN_PGR
 //
@@ -44,16 +71,24 @@ IDL_INT IDL_CDECL open_pgr(int argc, char *argv[])
   unsigned int ncameras = 0;
 
   error = fc2CreateContext(&context);
+  if (error) {
+    fprintf(stderr, "could not create context: %d\n", error);
+  }
   error = fc2GetNumOfCameras(context, &ncameras);
   if (ncameras != 1) {
 	fprintf(stderr, "%d cameras found\n", ncameras);
 	return (IDL_INT) -2;
   }	
   error = fc2GetCameraFromIndex(context, 0, &guid);
+  fprintf(stderr, "get camera: %d\n", error);
   error = fc2Connect(context, &guid);
+  fprintf(stderr, "connect: %d\n", error);
   error = fc2StartCapture(context);
+  fprintf(stderr, "start capture: %d\n", error);
   error = fc2CreateImage(&image);
+  fprintf(stderr, "create image: %d\n", error);
   error = fc2RetrieveBuffer(context, &image);
+  fprintf(stderr, "retrieve buffer: %d\n", error);
 
   // return information about video
   *(IDL_INT *) argv[0] = (IDL_INT) image.cols;
@@ -249,3 +284,25 @@ IDL_INT IDL_CDECL write_property(int argc, char *argv[])
 }
 
   
+//
+// IDL_Load
+//
+int IDL_Load (void)
+{
+  int status;
+  int nmsgs, nfcns;
+
+  static IDL_SYSFUN_DEF2 function_addr[] = {
+    { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0},
+  };
+
+  nmsgs = IDL_CARRAY_ELTS(msg_arr);
+  msg_block = IDL_MessageDefineBlock("idlpgr", nmsgs, msg_arr);
+  if (!msg_block)
+    return IDL_FALSE;
+
+  nfcns = IDL_CARRAY_ELTS(function_addr);
+  status = IDL_SysRtnAdd(function_addr, TRUE, nfcns);
+
+  return status;
+}

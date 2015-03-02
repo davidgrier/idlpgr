@@ -1,0 +1,6 @@
+MODULE idlpgr
+DESCRIPTION IDL interface to the PointGrey FlyCap2 API
+VERSION 0.1
+SOURCE David G. Grier, New York University
+BUILD_DATE MAR 02 2015
+FUNCTION IDLPGR_CREATECONTEXT 0 0
