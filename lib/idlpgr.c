@@ -33,10 +33,12 @@ fc2Image   image;
 // Error messages
 static IDL_MSG_DEF msg_arr[] =
   {
-#define M_IDLPGR_NOERROR  0
+#define M_IDLPGR_NOERROR      0
     { "M_IDLPGR_NOERROR", "%NNo errors." },
-#define M_IDLPGR_NOCONTEXT -1
+#define M_IDLPGR_NOCONTEXT   -1
     { "M_IDLPGR_NOCONTEXT", "%NCould not create context." },
+#define M_IDLPGR_BADCONTEXT -2
+    { "M_IDLPGR_BADCONTEXT", "%NProvided context variable is not valid." },
   };
 
 static IDL_MSG_BLOCK msg_block;
@@ -50,13 +52,33 @@ IDL_VPTR idlpgr_CreateContext(int argc, IDL_VPTR argv[])
   fc2Context context;
 
   error = fc2CreateContext(&context);
-  if (error) {
+  if (error)
     IDL_MESSAGE(M_IDLPGR_NOCONTEXT, IDL_MSG_LONGJMP);
-  }
 
-  return IDL_GettmpLong(1);
+  fprintf(stderr, "%p\n", context);
+
+  return IDL_GettmpULong64((IDL_ULONG64) context);
 }
 
+//
+// idlpgr_DestroyContext
+//
+void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+  if (!context)
+    IDL_Message(M_IDLPGR_BADCONTEXT, IDL_MSG_LONGJMP);
+  error = fc2DestroyContext(context);
+  if (error) 
+    IDL_Message(M_IDLPGR_BADCONTEXT, IDL_MSG_LONGJMP);
+  IDL_StoreScalarZero(argv[0], IDL_TYP_LONG);
+}
+    
 //
 // OPEN_PGR
 //
@@ -291,10 +313,15 @@ IDL_INT IDL_CDECL write_property(int argc, char *argv[])
 int IDL_Load (void)
 {
   int status;
-  int nmsgs, nfcns;
+  int nmsgs, nfcns, npros;
 
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0},
+  };
+
+  static IDL_SYSFUN_DEF2 procedure_addr[] = {
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_DestroyContext, "IDLPGR_DESTROYCONTEXT", 1, 1, 0, 0},
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
@@ -304,6 +331,9 @@ int IDL_Load (void)
 
   nfcns = IDL_CARRAY_ELTS(function_addr);
   status = IDL_SysRtnAdd(function_addr, TRUE, nfcns);
+
+  npros = IDL_CARRAY_ELTS(procedure_addr);
+  status &= IDL_SysRtnAdd(procedure_addr, FALSE, npros);
 
   return status;
 }

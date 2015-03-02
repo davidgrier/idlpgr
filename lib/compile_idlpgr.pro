@@ -14,7 +14,6 @@ project_directory = './'
 compile_directory = './build'
 infiles = 'idlpgr'
 outfile = 'idlpgr'
-ern = ['open_pgr', 'close_pgr', 'read_pgr']
 
 extra_cflags = '-I/usr/include/flycapture'
 extra_lflags = '-lflycapture-c -lflycapture'
@@ -22,11 +21,12 @@ extra_lflags = '-lflycapture-c -lflycapture'
 ;;;;;
 ;
 ; Build the library
-make_dll, infiles, outfile, ern, $
+make_dll, infiles, outfile, 'IDL_Load', $
           extra_cflags = extra_cflags, $
           extra_lflags = extra_lflags, $
 	  input_directory = project_directory, $
           output_directory = project_directory, $
-          compile_directory = compile_directory
+          compile_directory = compile_directory, $
+          /platform_extension
 
 exit
