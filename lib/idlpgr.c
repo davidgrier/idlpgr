@@ -74,7 +74,92 @@ void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
 			 "Could not destroy specified context.", error);
   IDL_StoreScalarZero(argv[0], IDL_TYP_LONG);
 }
-    
+
+//
+// idlpgr_GetNumOfCameras
+//
+IDL_VPTR idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  unsigned int ncameras = 0;
+
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  error = fc2GetNumOfCameras(context, &ncameras);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not count cameras.", error);
+  
+  return IDL_GettmpLong(ncameras);
+}
+
+//
+// idlpgr_GetCameraFromIndex
+//
+IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  int camera;
+  fc2PGRGuid guid;
+  IDL_VPTR idl_guid;
+  IDL_ULONG *pd;
+  IDL_MEMINT dim = 4;
+  int i;
+
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  camera = (argc == 2) ? (int) IDL_LongScalar(argv[1]) : 0;
+
+  error = fc2GetCameraFromIndex(context, camera, &guid);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not acquire specified camera.", error);
+
+  // transfer camera guid to IDL as a vector of ULONG values
+  pd = (IDL_ULONG *) IDL_MakeTempVector(IDL_TYP_ULONG, 
+					dim, IDL_ARR_INI_NOP, &idl_guid);
+  for (i = 0; i < 4; i++)
+    pd[i] = guid.value[i];
+  
+  return idl_guid;
+}
+
+//
+// idlpgr_Connect
+//
+void idlpgr_Connect(int argc, IDL_VPTR argv[])
+ {
+  fc2Error error;
+  fc2Context context;
+  fc2PGRGuid guid;
+  IDL_MEMINT n;
+  IDL_ULONG *pd;
+  int i;
+  
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  IDL_EXCLUDE_EXPR(argv[1]);
+  IDL_ENSURE_ARRAY(argv[1]);
+  if (argv[1]->value.arr->n_elts != 4)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Provided variable is not a camera GUID.");
+  pd = (IDL_ULONG *) argv[1]->value.arr->data;
+  for (i = 0; i < 4; i++)
+    guid.value[i] = pd[i];
+  error = fc2Connect(context, &guid);
+  if (error) 
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not connect camera to context.", error);
+}
+
 //
 // OPEN_PGR
 //
@@ -312,12 +397,16 @@ int IDL_Load (void)
   int nmsgs, nfcns, npros;
 
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0},
+    { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0 },
+    { idlpgr_GetNumOfCameras, "IDLPGR_GETNUMOFCAMERAS", 1, 1, 0, 0 },
+    { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_DestroyContext, "IDLPGR_DESTROYCONTEXT", 1, 1, 0, 0},
+      idlpgr_DestroyContext, "IDLPGR_DESTROYCONTEXT", 1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_Connect, "IDLPGR_CONNECT", 2, 2, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
