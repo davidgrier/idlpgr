@@ -33,15 +33,13 @@ fc2Image   image;
 // Error messages
 static IDL_MSG_DEF msg_arr[] =
   {
-#define M_IDLPGR_NOERROR      0
-    { "M_IDLPGR_NOERROR", "%NNo errors." },
-#define M_IDLPGR_NOCONTEXT   -1
-    { "M_IDLPGR_NOCONTEXT", "%NCould not create context." },
-#define M_IDLPGR_BADCONTEXT -2
-    { "M_IDLPGR_BADCONTEXT", "%NProvided context variable is not valid." },
+#define M_IDLPGR_ERROR      0
+    { "M_IDLPGR_ERROR", "%NError: %s" },
+#define M_IDLPGR_ERRORCODE -1
+    { "M_IDLPGR_ERRORCODE", "%NError: %s Code: %0X" },
   };
 
-static IDL_MSG_BLOCK msg_block;
+static IDL_MSG_BLOCK msgs;
 
 //
 // idlpgr_CreateContext
@@ -53,9 +51,8 @@ IDL_VPTR idlpgr_CreateContext(int argc, IDL_VPTR argv[])
 
   error = fc2CreateContext(&context);
   if (error)
-    IDL_MESSAGE(M_IDLPGR_NOCONTEXT, IDL_MSG_LONGJMP);
-
-  fprintf(stderr, "%p\n", context);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP, 
+			 "Could not create context.", error);
 
   return IDL_GettmpULong64((IDL_ULONG64) context);
 }
@@ -71,11 +68,10 @@ void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
   IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
-  if (!context)
-    IDL_Message(M_IDLPGR_BADCONTEXT, IDL_MSG_LONGJMP);
   error = fc2DestroyContext(context);
-  if (error) 
-    IDL_Message(M_IDLPGR_BADCONTEXT, IDL_MSG_LONGJMP);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not destroy specified context.", error);
   IDL_StoreScalarZero(argv[0], IDL_TYP_LONG);
 }
     
@@ -325,8 +321,8 @@ int IDL_Load (void)
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
-  msg_block = IDL_MessageDefineBlock("idlpgr", nmsgs, msg_arr);
-  if (!msg_block)
+  msgs = IDL_MessageDefineBlock("idlpgr", nmsgs, msg_arr);
+  if (!msgs)
     return IDL_FALSE;
 
   nfcns = IDL_CARRAY_ELTS(function_addr);
