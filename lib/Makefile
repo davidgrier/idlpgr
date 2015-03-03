@@ -6,23 +6,23 @@
 #
 # Copyright (c) 2013 David G. Grier
 #
-TARGET = idlpgr.so
 SRCS = idlpgr.c
+DLM = idlpgr.dlm
 IDL = idl -quiet
 INSTALL = install
 DESTINATION = lib
 
-all: $(TARGET)
+all: library
 
-$(TARGET): $(SRCS)
+library: $(SRCS)
 	@$(IDL) compile_idlpgr
 
 install: all
 	sudo $(INSTALL) -d $(DESTINATION)
-	sudo $(INSTALL) $(TARGET) $(DESTINATION)
+	sudo $(INSTALL) idlpgr*.so $(DLM) $(DESTINATION)
 
 uninstall:
-	sudo rm $(DESTINATION)/$(TARGET)
+	sudo rm $(DESTINATION)/*
 	sudo rmdir $(DESTINATION)
 
 test: $(TARGET)
