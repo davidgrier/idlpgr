@@ -230,24 +230,62 @@ IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 void idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
-  fc2Image image;
-  unsigned char *pd;
+  fc2Image *image;
 
   IDL_EXCLUDE_EXPR(argv[0]);
   IDL_ENSURE_ARRAY(argv[0]);
-  if (argv[1]->value.arr->n_elts != sizeof(image))
+  if (argv[0]->value.arr->n_elts != sizeof(fc2Image))
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
 			 "Argument is not a valid image descriptor.");
   
-  pd = (unsigned char *) argv[0]->value.arr->data;
-  memcpy((unsigned char *) &image, pd, sizeof(image));
+  image = (fc2Image *) argv[0]->value.arr->data;
 
-  error = fc2DestroyImage(&image);
+  error = fc2DestroyImage(image);
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not destroy image.", error);
 }
 
+//
+// idlpgr_RetrieveBuffer
+//
+IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  fc2Image *image;
+  IDL_MEMINT ndims, dims[3];
+
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  IDL_EXCLUDE_EXPR(argv[1]);
+  IDL_ENSURE_ARRAY(argv[1]);
+  if (argv[1]->value.arr->n_elts != sizeof(fc2Image))
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Argument is not a valid image descriptor.");
+  image = (fc2Image *) argv[1]->value.arr->data;
+  
+  error = fc2RetrieveBuffer(context, image);
+  if (error) 
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not retrieve image buffer.", error);
+
+  if (image->cols == image->stride) {
+    ndims = 2;
+    dims[0] = image->cols;
+    dims[1] = image->rows;
+  } else {
+    ndims = 3;
+    dims[0] = 3;
+    dims[1] = image->cols;
+    dims[2] = image->rows;
+  }
+  
+  return IDL_ImportArray(ndims, dims, IDL_TYP_BYTE,
+			 (UCHAR *) image->pData, NULL, NULL);
+}
 //
 // OPEN_PGR
 //
@@ -489,6 +527,7 @@ int IDL_Load (void)
     { idlpgr_GetNumOfCameras, "IDLPGR_GETNUMOFCAMERAS", 1, 1, 0, 0 },
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
     { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
+    { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
