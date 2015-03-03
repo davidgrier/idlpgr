@@ -1,9 +1,9 @@
-function read_pgr, camera
+function read_pgr, pgr
 
 COMPILE_OPT IDL2
 
-a = bytarr(camera.nx, camera.ny, /nozero)
-error = call_external('idlpgr.so', 'read_pgr', a)
+if ~isa(pgr, 'IDLPGR') then $
+   return, 0
 
-return, (error) ? error : a
+return, idlpgr_RetrieveBuffer(pgr.context, pgr.image)
 end

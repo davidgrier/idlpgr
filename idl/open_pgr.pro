@@ -2,16 +2,15 @@ function open_pgr
 
 COMPILE_OPT IDL2
 
-nx = 0
-ny = 0
-error = call_external('idlpgr.so', 'open_pgr', nx, ny)
-if ~error then begin
-  s = {pgr, $
-       nx: nx, $ ; width of image
-       ny: ny  $ ; height of image
-      }
-  return, s
-endif
+context = idlpgr_CreateContext()
+camera = idlpgr_GetCameraFromIndex(a, 0)
+idlpgr_Connect, context, camera
+idlpgr_StartCapture, context
+image = idlpgr_CreateImage(context)
 
-return, error
+pgr = {IDLPGR, $
+       context: context, $
+       image: image}
+
+return, pgr
 end

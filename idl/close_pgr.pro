@@ -1,8 +1,10 @@
-function close_pgr
+pro close_pgr, pgr
 
 COMPILE_OPT IDL2
 
-error = call_external('idlpgr.so', 'close_pgr')
-
-return, error
+if isa(pgr, 'IDLPGR') then begin
+   idlpgr_StopCapture, pgr.context
+   idlpgr_DestroyContext, pgr.context
+   idlpgr_DestroyImage, pgr.image
+endif
 end
