@@ -65,14 +65,12 @@ void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
 
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   error = fc2DestroyContext(context);
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not destroy specified context.", error);
-  IDL_StoreScalarZero(argv[0], IDL_TYP_LONG);
 }
 
 //
@@ -84,7 +82,6 @@ IDL_VPTR idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
   fc2Context context;
   unsigned int ncameras = 0;
 
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
@@ -110,7 +107,6 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
   IDL_MEMINT dim = 4;
   int i;
 
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
@@ -142,11 +138,9 @@ void idlpgr_Connect(int argc, IDL_VPTR argv[])
   IDL_ULONG *pd;
   int i;
   
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
-  IDL_EXCLUDE_EXPR(argv[1]);
   IDL_ENSURE_ARRAY(argv[1]);
   if (argv[1]->value.arr->n_elts != 4)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
@@ -168,7 +162,6 @@ void idlpgr_StartCapture(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   
@@ -186,7 +179,6 @@ void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   
@@ -208,7 +200,6 @@ IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
   unsigned char *pd;
   IDL_VPTR idl_image;
 
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
@@ -232,7 +223,6 @@ void idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Image *image;
 
-  IDL_EXCLUDE_EXPR(argv[0]);
   IDL_ENSURE_ARRAY(argv[0]);
   if (argv[0]->value.arr->n_elts != sizeof(fc2Image))
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
@@ -256,11 +246,9 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   fc2Image *image;
   IDL_MEMINT ndims, dims[3];
 
-  IDL_ENSURE_SIMPLE(argv[0]);
   IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
-  IDL_EXCLUDE_EXPR(argv[1]);
   IDL_ENSURE_ARRAY(argv[1]);
   if (argv[1]->value.arr->n_elts != sizeof(fc2Image))
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
