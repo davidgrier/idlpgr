@@ -122,8 +122,8 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
 			 "Could not acquire specified camera.", error);
 
   // transfer camera guid to IDL as a vector of ULONG values
-  pd = (IDL_ULONG *) IDL_MakeTempVector(IDL_TYP_ULONG, 
-					dim, IDL_ARR_INI_NOP, &idl_guid);
+  pd = (IDL_ULONG *) 
+    IDL_MakeTempVector(IDL_TYP_ULONG, dim, IDL_ARR_INI_NOP, &idl_guid);
   for (i = 0; i < 4; i++)
     pd[i] = guid.value[i];
   
@@ -194,6 +194,58 @@ void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not stop capture.", error);
+}
+
+//
+// idlpgr_CreateImage
+//
+IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  fc2Image image;
+  IDL_MEMINT dim;
+  unsigned char *pd;
+  IDL_VPTR idl_image;
+
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  error = fc2CreateImage(&image);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could create image.", error);
+
+  dim = (IDL_MEMINT) sizeof(image);
+  
+  pd = IDL_MakeTempVector(IDL_TYP_BYTE, dim, IDL_ARR_INI_ZERO, &idl_image);
+  memcpy(pd, (unsigned char *) &image, dim);
+
+  return idl_image;
+}
+//
+// idlpgr_DestroyImage
+//
+void idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Image image;
+  unsigned char *pd;
+
+  IDL_EXCLUDE_EXPR(argv[0]);
+  IDL_ENSURE_ARRAY(argv[0]);
+  if (argv[1]->value.arr->n_elts != sizeof(image))
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Argument is not a valid image descriptor.");
+  
+  pd = (unsigned char *) argv[0]->value.arr->data;
+  memcpy((unsigned char *) &image, pd, sizeof(image));
+
+  error = fc2DestroyImage(&image);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not destroy image.", error);
 }
 
 //
@@ -436,6 +488,7 @@ int IDL_Load (void)
     { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0 },
     { idlpgr_GetNumOfCameras, "IDLPGR_GETNUMOFCAMERAS", 1, 1, 0, 0 },
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
+    { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
@@ -447,6 +500,8 @@ int IDL_Load (void)
       idlpgr_StartCapture, "IDLPGR_STARTCAPTURE", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_StopCapture, "IDLPGR_STOPCAPTURE", 1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
