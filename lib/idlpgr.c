@@ -179,6 +179,24 @@ void idlpgr_StartCapture(int argc, IDL_VPTR argv[])
 }
 
 //
+// idlpgr_StopCapture
+//
+void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  
+  IDL_ENSURE_SIMPLE(argv[0]);
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+  
+  error = fc2StopCapture(context);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not stop capture.", error);
+}
+
+//
 // OPEN_PGR
 //
 // Initiates communication with Point Grey camera
@@ -427,6 +445,8 @@ int IDL_Load (void)
       idlpgr_Connect, "IDLPGR_CONNECT", 2, 2, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_StartCapture, "IDLPGR_STARTCAPTURE", 1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_StopCapture, "IDLPGR_STOPCAPTURE", 1, 1, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
