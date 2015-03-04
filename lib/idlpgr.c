@@ -323,11 +323,12 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   fc2PropertyInfo info;
-  static IDL_MEMINT s[] = {1, MAX_STRING_LENGTH};
-  static IDL_MEMINT r[] = {1, 8};
-  void *ps;
   static IDL_MEMINT one = 1;
+  static IDL_MEMINT r[] = {1, 8};
+  static IDL_MEMINT s[] = {1, MAX_STRING_LENGTH};
   IDL_VPTR idl_info;
+  IDL_StructDefPtr sdef;
+  char *pd;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   info.type = (fc2PropertyType) IDL_LongScalar(argv[1]);
@@ -336,27 +337,29 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not get requested property information.", error);
-  
+
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "TYPE",             0, (void *) IDL_TYP_LONG },
     { "PRESENT",          0, (void *) IDL_TYP_LONG },
     { "AUTOSUPPORTED",    0, (void *) IDL_TYP_LONG },
     { "MANUALSUPPORTED",  0, (void *) IDL_TYP_LONG },
     { "ONOFFSUPPORTED",   0, (void *) IDL_TYP_LONG },
+    { "ONEPUSHSUPPORTED", 0, (void *) IDL_TYP_LONG },
     { "ABSVALSUPPORTED",  0, (void *) IDL_TYP_LONG },
     { "READOUTSUPPORTED", 0, (void *) IDL_TYP_LONG },
     { "MIN",              0, (void *) IDL_TYP_ULONG },
     { "MAX",              0, (void *) IDL_TYP_ULONG },
     { "ABSMIN",           0, (void *) IDL_TYP_FLOAT },
     { "ABSMAX",           0, (void *) IDL_TYP_FLOAT },
-    { "PUNITS",           s, (void *) IDL_TYP_STRING },
-    { "PUNITABBR",        s, (void *) IDL_TYP_STRING },
+    { "PUNITS",           s, (void *) IDL_TYP_BYTE },
+    { "PUNITABBR",        s, (void *) IDL_TYP_BYTE },
     { "RESERVED",         r, (void *) IDL_TYP_ULONG },
-    { 0 },
+    { 0 }
   };
-  ps = IDL_MakeStruct("fc2PropertyInfo", tags);
-  idl_info = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, 
-			     (UCHAR *) &info, 0, ps);
+
+  sdef = IDL_MakeStruct("fc2PropertyInfo", tags);
+  pd = IDL_MakeTempStruct(sdef, 1, &one, &idl_info, TRUE);
+  memcpy(pd, (char *) &info, sizeof(fc2PropertyInfo));
 
   return idl_info;
 }
@@ -374,9 +377,10 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
   fc2Context context;
   fc2Property property;
   static IDL_MEMINT r[] = {1, 8};
-  void *pp;
   static IDL_MEMINT one = 1;
   IDL_VPTR idl_property;
+  IDL_StructDefPtr sdef;
+  char *pd;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   property.type = (fc2PropertyType) IDL_LongScalar(argv[1]);
@@ -387,6 +391,7 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 			 "Could not get requested property.", error);
   
   static IDL_STRUCT_TAG_DEF tags[] = {
+    { "TYPE",           0, (void *) IDL_TYP_LONG },
     { "PRESENT",        0, (void *) IDL_TYP_LONG },
     { "ABSCONTROL",     0, (void *) IDL_TYP_LONG },
     { "ONEPUSH",        0, (void *) IDL_TYP_LONG },
@@ -396,11 +401,11 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
     { "VALUEB",         0, (void *) IDL_TYP_ULONG },
     { "ABSVALUE",       0, (void *) IDL_TYP_FLOAT },
     { "RESERVED",       r, (void *) IDL_TYP_ULONG },
-    { 0 },
+    { 0 }
   };
-  pp = IDL_MakeStruct("fc2Property", tags);
-  idl_property = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, 
-				 (UCHAR *) &property, 0, pp);
+  sdef = IDL_MakeStruct("fc2Property", tags);
+  pd = IDL_MakeTempStruct(sdef, 1, &one, &idl_property, TRUE);
+  memcpy(pd, (char *) &property, sizeof(fc2Property));
 
   return idl_property;
 }
