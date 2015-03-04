@@ -396,38 +396,28 @@ IDL_VPTR idlpgr_ReadProperty(int argc, IDL_VPTR argv[])
 }
 
 //
-// WRITE_PROPERTY
+// idlpgr_SetProperty
 //
 // Write property values to camera
 //
 // Reference: FlyCapture2Defs_C.h
 //
-// argv[0]: IN property type
-// argv[1]: IN absControl -- floating point value
-// argv[2]: IN onePush -- camera controls feature once and then returns control
-// argv[3]: IN onOFF -- true means property is on
-// argv[4]: IN autoManualMode -- true means property is set automatically
-// argv[5]: IN valueA
-// argv[6]: IN valueB not used?
-// argv[7]: IN absValue -- floating point value if absControl is true
-//
-IDL_INT IDL_CDECL write_property(int argc, char *argv[])
+void idlpgr_SetProperty(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
+  fc2Context context;
   fc2Property property;
 
-  property.type = *(fc2PropertyType *) argv[0];
-  property.absControl = *(BOOL *) argv[1];
-  property.onePush = *(BOOL *) argv[2];
-  property.onOff = *(BOOL *) argv[3];
-  property.autoManualMode = *(BOOL *) argv[4];
-  property.valueA = *(unsigned int *) argv[5];
-  property.valueB = *(unsigned int *) argv[6];
-  property.absValue = *(float *) argv[7];
- 
-  error = fc2SetProperty(context, &property);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
-  return (IDL_INT) error;
+  IDL_ENSURE_STRUCTURE(argv[1]);
+  // FIXME check structure name
+  memcpy((char *) &property, (char *) argv[1]->value.s.arr->data, sizeof(fc2Property));
+
+  error = fc2SetProperty(context, &property);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not set requested property.", error);
 }
 
 //
@@ -462,6 +452,8 @@ int IDL_Load (void)
       idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_WriteRegister, "IDLPGR_WRITEREGISTER", 3, 3, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
