@@ -358,13 +358,13 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 }
 
 //
-// idlpgr_ReadProperty
+// idlpgr_GetProperty
 //
 // Read property values from camera
 //
 // Reference: FlyCapture2Defs_C.h
 //
-IDL_VPTR idlpgr_ReadProperty(int argc, IDL_VPTR argv[])
+IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -436,7 +436,7 @@ int IDL_Load (void)
     { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
     { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
     { idlpgr_GetPropertyInfo, "IDLPGR_GETPROPERTYINFO", 2, 2, 0, 0 },
-    { idlpgr_ReadProperty, "IDLPGR_READPROPERTY", 2, 2, 0, 0 },
+    { idlpgr_GetProperty, "IDLPGR_GETPROPERTY", 2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
