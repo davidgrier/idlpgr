@@ -276,25 +276,28 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
 }
 
 //
-// READ_REGISTER
+// idlpgr_ReadRegister
 //
 // Read contents of specified register
 //
-// argv[0]: IN camera register index
-// argv[1]: OUT value in register
-//
-IDL_INT IDL_CDECL read_register(int argc, char *argv[])
+IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
+  fc2Context context;
   unsigned int address, value;
 
-  address = *(unsigned int *) argv[0];
-  // fprintf(stderr, "address %x, size %d\n", address, sizeof(address));
-  error = fc2ReadRegister(context, address, &value);
-  // fprintf(stderr, "value %x\n", value);
-  *(IDL_ULONG *) argv[1] = (IDL_ULONG) value;
+  IDL_ENSURE_SCALAR(argv[0]);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
-  return (IDL_INT) error;
+  IDL_ENSURE_SCALAR(argv[1]);
+  address = (unsigned int) IDL_ULongScalar(argv[1]);
+  
+  error = fc2ReadRegister(context, address, &value);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not read from specified register.", error);
+  
+  return IDL_GettmpULong((IDL_ULONG) value);
 }
 
 //
@@ -447,6 +450,7 @@ int IDL_Load (void)
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
     { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
     { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
+    { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
