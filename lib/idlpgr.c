@@ -372,8 +372,10 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   fc2Property property;
-  IDL_MEMINT r[] = {1, 8};
-  void *idl_property;
+  static IDL_MEMINT r[] = {1, 8};
+  void *pp;
+  static IDL_MEMINT one = 1;
+  IDL_VPTR idl_property;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   property.type = (fc2PropertyType) IDL_Long(argv[1]);
@@ -395,8 +397,9 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
     { "RESERVED",       r, (void *) IDL_TYP_ULONG },
     { 0 },
   };
-  idl_property = IDL_MakeStruct("fc2Property", tags);
-  memcpy((char *) idl_property->value.s.arr->data, (char *) &property, sizeof(fc2Property));
+  pp = IDL_MakeStruct("fc2Property", tags);
+  idl_property = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, 
+				 (UCHAR *) &property, 0, pp);
 
   return idl_property;
 }
