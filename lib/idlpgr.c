@@ -311,46 +311,49 @@ void idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 }
 
 //
-// PROPERTY_INFO
+// idlpgr_GetPropertyInfo
 //
 // Get information about property
 //
 // Reference: FlyCapture2Defs_C.h
 //
-// argv[0]: IN property type
-// argv[1]: OUT present
-// argv[2]: OUT autoSupported
-// argv[3]: OUT manualSupported
-// argv[4]: OUT onOffSupported
-// argv[5]: OUT absValSupported
-// argv[6]: OUT readOutSupported
-// argv[7]: OUT min
-// argv[8]: OUT max
-// argv[9]: OUT absMin
-// argv[10]: OUT absMax
-// argv[11]: OUT pUnits -- NOT IMPLEMENTED
-// argv[12]: OUT pUnitsAbbr -- NOT IMPLEMENTED
-//
-IDL_INT IDL_CDECL property_info(int argc, char *argv[])
+IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
+  fc2Context context;
   fc2PropertyInfo info;
+  IDL_MEMINT s[] = {1, MAX_STRING_LENGTH};
+  IDL_MEMINT r[] = {1, 8};
+  void *idl_info;
 
-  info.type = *(fc2PropertyType *) argv[0];
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+  info.type = (fc2PropertyType) IDL_Long(argv[1]);
+
   error = fc2GetPropertyInfo(context, &info);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not get requested property information.", error);
+  
+  static IDL_STRUCT_TAG_DEF tags[] = {
+    { "PRESENT",          0, (void *) IDL_TYP_LONG },
+    { "AUTOSUPPORTED",    0, (void *) IDL_TYP_LONG },
+    { "MANUALSUPPORTED",  0, (void *) IDL_TYP_LONG },
+    { "ONOFFSUPPORTED",   0, (void *) IDL_TYP_LONG },
+    { "ABSVALSUPPORTED",  0, (void *) IDL_TYP_LONG },
+    { "READOUTSUPPORTED", 0, (void *) IDL_TYP_LONG },
+    { "MIN",              0, (void *) IDL_TYP_ULONG },
+    { "MAX",              0, (void *) IDL_TYP_ULONG },
+    { "ABSMIN",           0, (void *) IDL_TYP_FLOAT },
+    { "ABSMAX",           0, (void *) IDL_TYP_FLOAT },
+    { "PUNITS",           s, (void *) IDL_TYP_STRING },
+    { "PUNITABBR",        s, (void *) IDL_TYP_STRING },
+    { "RESERVED",         r, (void *) IDL_TYP_ULONG },
+    { 0 },
+  };
+  idl_info = IDL_MakeStruct("fc2PropertyInfo", tags);
+  memcpy((char *) idl_info->value.s.arr->data, (char *) &info, sizeof(fc2PropertyInfo));
 
-  *(IDL_INT *) argv[1] = (IDL_INT) info.present;
-  *(IDL_INT *) argv[2] = (IDL_INT) info.autoSupported;
-  *(IDL_INT *) argv[3] = (IDL_INT) info.manualSupported;
-  *(IDL_INT *) argv[4] = (IDL_INT) info.onOffSupported;
-  *(IDL_INT *) argv[5] = (IDL_INT) info.absValSupported;
-  *(IDL_INT *) argv[6] = (IDL_INT) info.readOutSupported;
-  *(IDL_ULONG *) argv[7] = (IDL_ULONG) info.min;
-  *(IDL_ULONG *) argv[8] = (IDL_ULONG) info.max;
-  *(float *) argv[9] = info.absMin;
-  *(float *) argv[10] = info.absMax;
-
-  return (IDL_INT) error;
+  return idl_info;
 }
 
 //
@@ -441,6 +444,7 @@ int IDL_Load (void)
     { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
     { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
     { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
+    { idlpgr_GetPropertyInfo, "IDLPGR_GETPROPERTYINFO", 2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
