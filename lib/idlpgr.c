@@ -376,7 +376,10 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
   property.type = (fc2PropertyType) IDL_Long(argv[1]);
 
   error = fc2GetProperty(context, &property);
-
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not get requested property.", error);
+  
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "PRESENT",        0, (void *) IDL_TYP_LONG },
     { "ABSCONTROL",     0, (void *) IDL_TYP_LONG },
