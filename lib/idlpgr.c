@@ -65,7 +65,6 @@ void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   error = fc2DestroyContext(context);
   if (error)
@@ -82,7 +81,6 @@ IDL_VPTR idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
   fc2Context context;
   unsigned int ncameras = 0;
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   error = fc2GetNumOfCameras(context, &ncameras);
@@ -107,7 +105,6 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
   IDL_MEMINT dim = 4;
   int i;
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   camera = (argc == 2) ? (int) IDL_LongScalar(argv[1]) : 0;
@@ -138,7 +135,6 @@ void idlpgr_Connect(int argc, IDL_VPTR argv[])
   IDL_ULONG *pd;
   int i;
   
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   IDL_ENSURE_ARRAY(argv[1]);
@@ -162,7 +158,6 @@ void idlpgr_StartCapture(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   
   error = fc2StartCapture(context);
@@ -179,7 +174,6 @@ void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   
   error = fc2StopCapture(context);
@@ -200,7 +194,6 @@ IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
   unsigned char *pd;
   IDL_VPTR idl_image;
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   error = fc2CreateImage(&image);
@@ -246,7 +239,6 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   fc2Image *image;
   IDL_MEMINT ndims, dims[3];
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   IDL_ENSURE_ARRAY(argv[1]);
@@ -286,10 +278,8 @@ IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
   fc2Context context;
   unsigned int address, value;
 
-  IDL_ENSURE_SCALAR(argv[0]);
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
-  IDL_ENSURE_SCALAR(argv[1]);
   address = (unsigned int) IDL_ULongScalar(argv[1]);
   
   error = fc2ReadRegister(context, address, &value);
