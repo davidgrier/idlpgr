@@ -330,7 +330,7 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
   IDL_VPTR idl_info;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
-  info.type = (fc2PropertyType) IDL_Long(argv[1]);
+  info.type = (fc2PropertyType) IDL_LongScalar(argv[1]);
 
   error = fc2GetPropertyInfo(context, &info);
   if (error)
@@ -378,7 +378,7 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
   IDL_VPTR idl_property;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
-  property.type = (fc2PropertyType) IDL_Long(argv[1]);
+  property.type = (fc2PropertyType) IDL_LongScalar(argv[1]);
 
   error = fc2GetProperty(context, &property);
   if (error)
@@ -461,8 +461,8 @@ int IDL_Load (void)
       idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_WriteRegister, "IDLPGR_WRITEREGISTER", 3, 3, 0, 0 },
-    //    { (IDL_SYSRTN_GENERIC)
-    //  idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
