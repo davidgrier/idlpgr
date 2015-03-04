@@ -308,7 +308,7 @@ void idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
   error = fc2WriteRegister(context, address, value);
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not write value to specified register." error);
+			 "Could not write value to specified register.", error);
 }
 
 //
@@ -323,9 +323,11 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   fc2PropertyInfo info;
-  IDL_MEMINT s[] = {1, MAX_STRING_LENGTH};
-  IDL_MEMINT r[] = {1, 8};
-  void *idl_info;
+  static IDL_MEMINT s[] = {1, MAX_STRING_LENGTH};
+  static IDL_MEMINT r[] = {1, 8};
+  void *ps;
+  static IDL_MEMINT one = 1;
+  IDL_VPTR idl_info;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   info.type = (fc2PropertyType) IDL_Long(argv[1]);
@@ -351,8 +353,9 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
     { "RESERVED",         r, (void *) IDL_TYP_ULONG },
     { 0 },
   };
-  idl_info = IDL_MakeStruct("fc2PropertyInfo", tags);
-  memcpy((char *) idl_info->value.s.arr->data, (char *) &info, sizeof(fc2PropertyInfo));
+  ps = IDL_MakeStruct("fc2PropertyInfo", tags);
+  idl_info = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, 
+			     (UCHAR *) &info, 0, ps);
 
   return idl_info;
 }
