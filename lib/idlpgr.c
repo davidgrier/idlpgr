@@ -461,8 +461,8 @@ int IDL_Load (void)
       idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_WriteRegister, "IDLPGR_WRITEREGISTER", 3, 3, 0, 0 },
-    { (IDL_SYSRTN_GENERIC)
-      idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
+    //    { (IDL_SYSRTN_GENERIC)
+    //  idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
