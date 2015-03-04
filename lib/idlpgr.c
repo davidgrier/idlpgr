@@ -422,12 +422,18 @@ void idlpgr_SetProperty(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   fc2Property property;
+  char *sname;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   IDL_ENSURE_STRUCTURE(argv[1]);
-  // FIXME check structure name
-  memcpy((char *) &property, (char *) argv[1]->value.s.arr->data, sizeof(fc2Property));
+  IDL_StructTagNameByIndex(argv[1], 0, IDL_MSG_LONGJMP, &sname);
+  if (strcmp(sname, "fc2Property"))
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Argument is not of type fc2Property.");
+
+  memcpy((char *) &property, (char *) argv[1]->value.s.arr->data, 
+	 sizeof(fc2Property));
 
   error = fc2SetProperty(context, &property);
   if (error)
