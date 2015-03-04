@@ -208,6 +208,7 @@ IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 
   return idl_image;
 }
+
 //
 // idlpgr_DestroyImage
 //
@@ -357,40 +358,41 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 }
 
 //
-// READ_PROPERTY
+// idlpgr_ReadProperty
 //
 // Read property values from camera
 //
 // Reference: FlyCapture2Defs_C.h
 //
-// argv[0]: IN property type
-// argv[1]: OUT present
-// argv[2]: OUT absControl
-// argv[3]: OUT onePush
-// argv[4]: OUT onOff
-// argv[5]: OUT autoManualMode
-// argv[6]: OUT valueA
-// argv[7]: OUT valueB
-// argv[8]: OUT absValue
-//
-IDL_INT IDL_CDECL read_property(int argc, char *argv[])
+IDL_VPTR idlpgr_ReadProperty(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
+  fc2Context context;
   fc2Property property;
+  IDL_MEMINT r[] = {1, 8};
+  void *idl_property;
 
-  property.type = *(fc2PropertyType *) argv[0];
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+  property.type = (fc2PropertyType) IDL_Long(argv[1]);
+
   error = fc2GetProperty(context, &property);
 
-  *(IDL_INT *) argv[1] = (IDL_INT) property.present;
-  *(IDL_INT *) argv[2] = (IDL_INT) property.absControl;
-  *(IDL_INT *) argv[3] = (IDL_INT) property.onePush;
-  *(IDL_INT *) argv[4] = (IDL_INT) property.onOff;
-  *(IDL_INT *) argv[5] = (IDL_INT) property.autoManualMode;
-  *(IDL_ULONG *) argv[6] = (IDL_ULONG) property.valueA;
-  *(IDL_ULONG *) argv[7] = (IDL_ULONG) property.valueB;
-  *(float *) argv[8] = property.absValue;
+  static IDL_STRUCT_TAG_DEF tags[] = {
+    { "PRESENT",        0, (void *) IDL_TYP_LONG },
+    { "ABSCONTROL",     0, (void *) IDL_TYP_LONG },
+    { "ONEPUSH",        0, (void *) IDL_TYP_LONG },
+    { "ONOFF",          0, (void *) IDL_TYP_LONG },
+    { "AUTOMANUALMODE", 0, (void *) IDL_TYP_LONG },
+    { "VALUEA",         0, (void *) IDL_TYP_ULONG },
+    { "VALUEB",         0, (void *) IDL_TYP_ULONG },
+    { "ABSVALUE",       0, (void *) IDL_TYP_FLOAT },
+    { "RESERVED",       r, (void *) IDL_TYP_ULONG },
+    { 0 },
+  };
+  idl_property = IDL_MakeStruct("fc2Property", tags);
+  memcpy((char *) idl_property->value.s.arr->data, (char *) &property, sizeof(fc2Property));
 
-  return (IDL_INT) error;
+  return idl_property;
 }
 
 //
@@ -428,7 +430,6 @@ IDL_INT IDL_CDECL write_property(int argc, char *argv[])
   return (IDL_INT) error;
 }
 
-  
 //
 // IDL_Load
 //
@@ -445,6 +446,7 @@ int IDL_Load (void)
     { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
     { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
     { idlpgr_GetPropertyInfo, "IDLPGR_GETPROPERTYINFO", 2, 2, 0, 0 },
+    { idlpgr_ReadProperty, "IDLPGR_READPROPERTY", 2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
