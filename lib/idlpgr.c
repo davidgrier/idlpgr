@@ -279,7 +279,6 @@ IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
   unsigned int address, value;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
-
   address = (unsigned int) IDL_ULongScalar(argv[1]);
   
   error = fc2ReadRegister(context, address, &value);
@@ -291,23 +290,24 @@ IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
 }
 
 //
-// WRITE_REGISTER
+// idlpgr_WriteRegister
 //
 // Write unsigned integer to specified register
 //
-// argv[0]: IN camera register index
-// argv[1]: IN value to be written to register
-//
-IDL_INT IDL_CDECL write_register(int argc, char *argv[])
+void idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
+  fc2Context context;
   unsigned int address, value;
 
-  address = *(unsigned int *) argv[0];
-  value = *(unsigned int *) argv[1];
-  error = fc2WriteRegister(context, address, value);
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+  address = (unsigned int) IDL_ULongScalar(argv[1]);
+  value =   (unsigned int) IDL_ULongScalar(argv[2]);
 
-  return (IDL_INT) error;
+  error = fc2WriteRegister(context, address, value);
+  if (error)
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not write value to specified register." error);
 }
 
 //
@@ -454,6 +454,8 @@ int IDL_Load (void)
       idlpgr_StopCapture, "IDLPGR_STOPCAPTURE", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_WriteRegister, "IDLPGR_WRITEREGISTER", 3, 3, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
