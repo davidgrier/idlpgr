@@ -338,6 +338,7 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 			 "Could not get requested property information.", error);
   
   static IDL_STRUCT_TAG_DEF tags[] = {
+    { "TYPE",             0, (void *) IDL_TYP_LONG },
     { "PRESENT",          0, (void *) IDL_TYP_LONG },
     { "AUTOSUPPORTED",    0, (void *) IDL_TYP_LONG },
     { "MANUALSUPPORTED",  0, (void *) IDL_TYP_LONG },
