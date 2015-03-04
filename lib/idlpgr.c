@@ -427,7 +427,7 @@ void idlpgr_SetProperty(int argc, IDL_VPTR argv[])
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
   IDL_ENSURE_STRUCTURE(argv[1]);
-  IDL_StructTagNameByIndex(argv[1], 0, IDL_MSG_LONGJMP, &sname);
+  IDL_StructTagNameByIndex(argv[1]->value.s.sdef, 0, IDL_MSG_LONGJMP, &sname);
   if (strcmp(sname, "fc2Property"))
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
 			 "Argument is not of type fc2Property.");
