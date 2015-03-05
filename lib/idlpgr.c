@@ -123,7 +123,6 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
   return idl_guid;
 }
 
-
 //
 // idlpgr_Connect
 //
