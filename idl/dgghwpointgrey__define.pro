@@ -179,7 +179,7 @@ pro DGGhwPointGrey::SetProperty, power = power, $
   endif
 
   if isa(power, /number, /scalar) then $
-     self.writeregister, '610'XUL, keyword_set(power)
+     self.writeregister, '610'XUL, long(keyword_set(power))
 end
 
 ;;;;;
