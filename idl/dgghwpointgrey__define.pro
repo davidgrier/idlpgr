@@ -15,16 +15,53 @@
 ;    IDL_OBJECT
 ;
 ; PROPERTIES:
-;    data  [ G ] [nx, ny] array of byte-valued data
-;    
-;    gray  [ G ] Flag: grayscale if set
+;    [ G ] PROPERTIES: list of supported PointGrey properties
+;    [ GS] BRIGHTNESS
+;    [ GS] AUTO_EXPOSURE
+;    [ GS] SHARPNESS
+;    [ GS] WHITE_BALANCE
+;    [ GS] HUE
+;    [ GS] SATURATION
+;    [ GS] GAMMA
+;    [ GS] IRIS
+;    [ GS] FOCUS
+;    [ GS] ZOOM
+;    [ GS] PAN
+;    [ GS] TILT
+;    [ GS] SHUTTER: Exposure time in milliseconds
+;    [ GS] GAIN   : Gain in dB
+;    [ GS] TRIGGER_MODE
+;    [ GS] TRIGGER_DELAY
+;    [ GS] FRAME_RATE
+;    [ GS] TEMPERATURE
+;
+;    [ G ] CAMERAINFO: structure of camera information
+;    [ GS] POWER: If set, camera is powered.
+;    [ GS] HFLIP: If set, flip image horizontally
 ;
 ; METHODS:
-;    GetProperty
-;    SetProperty
+;    GetProperty, property = property, ...
+;    SetProperty, property = value
+;
+;    PropertyInfo(property)
+;       Returns a structure of information about the specified
+;       property
+;
+;    ControlProperty, property, keywords
+;       KEYWORD FLAGS:
+;          ON (OFF): If set, turn property ON (or OFF).
+;          AUTO (MANUAL): If set, property will be set automatically
+;              (manually).
+;          ONEPUSH: If set, property will be adjusted automatically
+;              and then will return to manual mode.
+;
+;    ReadRegister(address)
+;        Read the value stored in the specified register
+;
+;    WriteRegister, address, value
+;        Write value to the register at the specified address
 ;
 ;    Read(): acquire next image from camera and return the data
-;    Read  : acquire next image from camera
 ;
 ; MODIFICATION HISTORY:
 ; 07/21/2013 Written by David G. Grier, New York University
@@ -35,30 +72,15 @@
 
 ;;;;;
 ;
-; DGGhwPointGrey::Read
-;
-; Acquire next video frame from camera
-;
-pro DGGhwPointGrey::Read
-
-COMPILE_OPT IDL2, HIDDEN
-
-error = call_external(self.dlm, 'read_pgr', *self.data)
-
-end
-
-;;;;;
-;
 ; DGGhwPointGrey::Read()
 ;
 ; Return next video frame from camera
 ;
 function DGGhwPointGrey::Read
 
-COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2, HIDDEN
 
-self.read
-return, *self.data
+  return, idlpgr_RetrieveBuffer(self.context, self.image)
 end
 
 ;;;;;
@@ -75,62 +97,6 @@ function DGGhwPointGrey::PropertyInfo, property
      return, error
 
   return, idlpgr_GetPropertyInfo(self.context, self.properties[property])
-end
-
-;;;;;
-;
-; DGGhwPointGrey::Property(property, [value])
-;
-; Reads and writes value of specified property
-;
-function DGGhwPointGrey::Property, property, value, $
-                                   detailed = detailed, $
-                                   on = on, $
-                                   off = off, $
-                                   auto = auto, $
-                                   manual = manual
-
-  COMPILE_OPT IDL2, HIDDEN
-
-  if (n_params() lt 1) || (n_params() gt 2) then $
-     return, 0
-
-  if ~self.properties.haskey(property) then $
-     return, 0
-
-  propid = self.properties[property]
-
-  prop = idlpgr_GetProperty(self.context, propid)
-  info = idlpgr_GetPropertyInfo(self.context, propid)
-
-  if isa(on, /number, /scalar) then $
-     prop.onOff = ~keyword_set(on)
-
-  if isa(off, /number, /scalar) then $
-     prop.onOff = keyword_set(off)
-
-  if isa(auto, /number, /scalar) then $
-     prop.autoManualMode = ~keyword_set(auto)
-
-  if isa(manual, /number, /scalar) then $
-     prop.autoManualMode = keyword_set(manual)
-
-  if n_params() eq 2 then begin
-     if info.absValSupported then begin
-        prop.absvalue = float(value) > info.absmin < info.absmax
-        prop.abscontrol = 1L
-     endif else begin
-        prop.valueA = ulong(value) > info.min < info.max
-     endelse
-     if info.onOffSupported then $
-        prop.onOff = 1L
-     prop.autoManualMode = 0L 
-     
-     idlpgr_SetProperty, self.context, prop
-  endif
-
-  return, keyword_set(detailed) ? prop : $
-          info.absValSupported ? prop.absvalue : prop.valueA
 end
 
 ;;;;;
@@ -178,7 +144,9 @@ end
 ;
 ; DGGhwPointGrey::SetProperty
 ;
-pro DGGhwPointGrey::SetProperty, _ref_extra = propertylist
+pro DGGhwPointGrey::SetProperty, power = power, $
+                                 hflip = hflip, $
+                                 _ref_extra = propertylist
 
   COMPILE_OPT IDL2, HIDDEN
   
@@ -204,15 +172,25 @@ pro DGGhwPointGrey::SetProperty, _ref_extra = propertylist
         endif
      endforeach
   endif
+
+  if isa(hflip, /number, /scalar) then begin
+     value = '80000000'XUL + (hflip ne 0)
+     self.writeregister, '1054'XUL, value
+  endif
+
+  if isa(power, /number, /scalar) then $
+     self.writeregister, '610'XUL, keyword_set(power)
 end
 
 ;;;;;
 ;
 ; DGGhwPointGrey::GetProperty
 ;
-pro DGGhwPointGrey::GetProperty, properties    = properties,    $
-                                 ;hflip         = hflip,         $
-                                 _ref_extra    = propertylist
+pro DGGhwPointGrey::GetProperty, power      = power, $
+                                 properties = properties, $
+                                 camerainfo = camerainfo, $
+                                 hflip      = hflip,      $
+                                 _ref_extra = propertylist
 
   COMPILE_OPT IDL2, HIDDEN
 
@@ -231,8 +209,36 @@ pro DGGhwPointGrey::GetProperty, properties    = properties,    $
   if arg_present(properties) then $
      properties = self.properties.keys()
 
+  if arg_present(camerainfo) then $
+     camerainfo = idlpgr_GetCameraInfo(self.context)
+
   if arg_present(hflip) then $
      hflip = (self.readregister('1054'XUL) and 1)
+
+  if arg_present(power) then $
+     power = self.readregister('610'XUL)
+end
+
+;;;;;
+;
+; DGGhwPointGrey::WriteRegister
+;
+pro DGGhwPointGrey::WriteRegister, address, value
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  idlpgr_WriteRegister, self.context, address, value
+end
+
+;;;;;
+;
+; DGGhwPointGrey::ReadRegister()
+;
+function DGGhwPointGrey::ReadRegister, address
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  return, idlpgr_ReadRegister(self.context, address)
 end
 
 ;;;;;
