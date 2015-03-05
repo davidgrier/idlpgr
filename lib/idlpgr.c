@@ -123,6 +123,7 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
   return idl_guid;
 }
 
+
 //
 // idlpgr_Connect
 //
@@ -148,6 +149,60 @@ void idlpgr_Connect(int argc, IDL_VPTR argv[])
   if (error) 
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not connect camera to context.", error);
+}
+
+//
+// idlpgr_GetCameraInfo
+//
+// Returns a subset of the fc2CameraInfo structure
+//
+IDL_VPTR idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Context context;
+  fc2CameraInfo camerainfo;
+  IDL_StructDefPtr sdef;
+  char *pd;
+  IDL_MEMINT one = 1;
+  IDL_VPTR idl_camerainfo;
+
+  context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
+  error = fc2GetCameraInfo(context, &camerainfo);
+  if (error) 
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "Could not read camera info.", error);
+
+  static IDL_STRUCT_TAG_DEF tags[] = {
+    { "SERIALNUMBER",     0, (void *) IDL_TYP_ULONG },
+    { "ISCOLORCAMERA",    0, (void *) IDL_TYP_LONG },
+    { "MODELNAME",        0, (void *) IDL_TYP_STRING },
+    { "VENDORNAME",       0, (void *) IDL_TYP_STRING },
+    { "SENSORINFO",       0, (void *) IDL_TYP_STRING },
+    { "SENSORRESOLUTION", 0, (void *) IDL_TYP_STRING },
+    { "DRIVERNAME",       0, (void *) IDL_TYP_STRING },
+    { "FIRMWAREVERSION",  0, (void *) IDL_TYP_STRING },
+    { 0 }
+  };
+  sdef = IDL_MakeStruct("fc2CameraInfo", tags);
+  pd = IDL_MakeTempStruct(sdef, 1, &one, &idl_camerainfo, TRUE);
+  *(IDL_ULONG *) pd      = camerainfo.serialNumber;
+  pd += sizeof(IDL_ULONG);
+  *(IDL_LONG *) pd = camerainfo.isColorCamera;
+  pd += sizeof(IDL_LONG);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.modelName);
+  pd += sizeof(IDL_STRING);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.vendorName);
+  pd += sizeof(IDL_STRING);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.sensorInfo);
+  pd += sizeof(IDL_STRING);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.sensorResolution);
+  pd += sizeof(IDL_STRING);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.driverName);
+  pd += sizeof(IDL_STRING);
+  IDL_StrStore((IDL_STRING *) pd, camerainfo.firmwareVersion);
+  
+  return idl_camerainfo;
 }
 
 //
@@ -453,6 +508,7 @@ int IDL_Load (void)
     { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0 },
     { idlpgr_GetNumOfCameras, "IDLPGR_GETNUMOFCAMERAS", 1, 1, 0, 0 },
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
+    { idlpgr_GetCameraInfo, "IDLPGR_GETCAMERAINFO", 1, 1, 0, 0 },
     { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
     { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
     { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
