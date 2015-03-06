@@ -85,6 +85,28 @@ end
 
 ;;;;;
 ;
+; DGGhwPointGrey::StartCapture
+;
+pro DGGhwPointGrey::StartCapture
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  idlpgr_StartCapture, self.context
+end
+
+;;;;;
+;
+; DGGhwPointGrey::StopCapture
+;
+pro DGGhwPointGrey::StopCapture
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  idlpgr_StopCapture, self.context
+end
+
+;;;;;
+;
 ; DGGhwPointGrey::PropertyInfo()
 ;
 ; Get information about specified property
@@ -263,7 +285,7 @@ function DGGhwPointGrey::Init, camera = _camera
   camera = idlpgr_GetCameraFromIndex(self.context, camera)
   idlpgr_Connect, self.context, camera
   self.writeregister, '601'XUL, 0UL
-  idlpgr_StartCapture, self.context
+  self.startcapture
   self.image =  idlpgr_CreateImage(self.context)
 
   properties = ['brightness',    $
@@ -302,7 +324,7 @@ pro DGGhwPointGrey::Cleanup
 
   COMPILE_OPT IDL2, HIDDEN
 
-  idlpgr_StopCapture, self.context
+  self.stopcapture
   self.writeregister, '610'XUL, 0UL ; turn power off
   idlpgr_DestroyContext, self.context
   idlpgr_DestroyImage, self.image
