@@ -11,9 +11,6 @@
 ; CALLING SEQUENCE:
 ;    a = DGGhwPointGrey()
 ;
-; SUBCLASSES:
-;    IDL_OBJECT
-;
 ; PROPERTIES:
 ;    [ G ] PROPERTIES: list of supported PointGrey properties
 ;    [ GS] BRIGHTNESS
