@@ -178,8 +178,12 @@ pro DGGhwPointGrey::SetProperty, power = power, $
      self.writeregister, '1054'XUL, value
   endif
 
-  if isa(power, /number, /scalar) then $
-     self.writeregister, '610'XUL, long(keyword_set(power))
+  if isa(power, /number, /scalar) then begin
+     power = self.readregister('610'XUL)
+     power or= ulong(keyword_set(power))
+     print, power
+     self.writeregister, '610'XUL, power
+  endif
 end
 
 ;;;;;
