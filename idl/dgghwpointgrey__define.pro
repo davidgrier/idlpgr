@@ -284,7 +284,7 @@ function DGGhwPointGrey::Init, camera = _camera
   self.context = idlpgr_CreateContext()
   camera = idlpgr_GetCameraFromIndex(self.context, camera)
   idlpgr_Connect, self.context, camera
-  self.writeregister, '601'XUL, 0UL
+  self.writeregister, '601'XUL, 1UL
   self.startcapture
   self.image =  idlpgr_CreateImage(self.context)
 
@@ -325,7 +325,7 @@ pro DGGhwPointGrey::Cleanup
   COMPILE_OPT IDL2, HIDDEN
 
   self.stopcapture
-  self.writeregister, '610'XUL, 0UL ; turn power off
+  self.writeregister, '610'XUL, 0UL
   idlpgr_DestroyContext, self.context
   idlpgr_DestroyImage, self.image
 end
