@@ -4,14 +4,15 @@
 # Modification History
 # 07/21/2013 Written by David G. Grier, New York University
 #
-# Copyright (c) 2013 David G. Grier
+# Copyright (c) 2013-2015 David G. Grier
 #
 INSTALL = install
 DESTINATION = pro
 FILES = open_pgr.pro \
         close_pgr.pro \
         read_pgr.pro \
-        dgghwpointgrey__define.pro
+        dgghwpointgrey__define.pro \
+        dgggrpointgrey__define.pro
 
 all:
 
