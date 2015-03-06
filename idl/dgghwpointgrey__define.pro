@@ -154,8 +154,12 @@ pro DGGhwPointGrey::SetProperty, power = power, $
      foreach name, strlowcase(propertylist) do begin
         if self.properties.haskey(name) then begin
            propertyid = self.properties[name]
-           prop = idlpgr_GetProperty(self.context, propertyid)
            info = idlpgr_GetPropertyInfo(self.context,  propertyid)
+           if ~info.present then begin
+              message, name + ' is not a valid property for this camera. Skipping', /inf
+              continue
+           endif
+           prop = idlpgr_GetProperty(self.context, propertyid)
            if info.absValSupported then begin
               prop.abscontrol = 1L
               value = float(scope_varfetch(name, /ref_extra))
@@ -202,10 +206,15 @@ pro DGGhwPointGrey::GetProperty, power      = power, $
      foreach name, strlowcase(propertylist) do begin
         if self.properties.haskey(name) then begin
            propertyid = self.properties[name]
-           prop = idlpgr_GetProperty(self.context, propertyid)
            info = idlpgr_GetPropertyInfo(self.context, propertyid)
-           (scope_varfetch(name, /ref_extra)) = (info.absValSupported) ? $
-                                                prop.absvalue : prop.valueA
+           if info.present then begin
+              prop = idlpgr_GetProperty(self.context, propertyid)
+              (scope_varfetch(name, /ref_extra)) = (info.absValSupported) ? $
+                                                   prop.absvalue : prop.valueA
+           endif else begin
+              message, name + ' is not a valid property for this camera.', /inf
+              (scope_varfetch(name, /ref_extra)) = 0
+           endelse
         endif
      endforeach
   endif
