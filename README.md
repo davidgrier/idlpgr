@@ -5,12 +5,12 @@
 IDL is the Interactive Data Language, and is a product of
 [Exelis Visual Information Solutions](http://www.exelisvis.com)
 
-idlpgr is licensed under the GPLv3.
+*idlpgr* is licensed under the GPLv3.
 
 ## What it does
 
-This package provides a rudimentary IDL interface for
-Point Gray cameras based on the FlyCapture2_C API.
+This package provides an IDL interface for
+PointGrey cameras based on the FlyCapture2 API.
 The preferred interface is through the `DGGhwPointGrey`
 object:
 
@@ -25,17 +25,21 @@ This package is written and maintained by David G. Grier
 
 ## INSTALLATION
 
-Requires the FlyCapture2 API to be installed, a working
-installation of IDL, and administrator (sudo) priviledges.
+### Install the FlyCapture2 API
+FlyCapture2 is available from the
+[PointGrey download site](http://www.ptgrey.com/support/downloads).
+Follow their instructions to install for your platform.
+
+### Install idlpgr
 
 1. unpack the distribution in a convenient directory.
 2. `cd idlpgr`
 3. `make`
 4. `make install`
 
-## UNINSTALLATION
+Installation requires super-user priviledges.
 
-Requires administrator (sudo) priviledges.
+## UNINSTALLATION
 
 1. `cd idlpgr`
 2. `make uninstall`
