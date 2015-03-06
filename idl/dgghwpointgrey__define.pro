@@ -215,7 +215,7 @@ end
 ; DGGhwPointGrey::GetProperty
 ;
 pro DGGhwPointGrey::GetProperty, properties    = properties,    $
-                                 ;hflip         = hflip,         $
+                                 hflip         = hflip,         $
                                  _ref_extra    = propertylist
 
   COMPILE_OPT IDL2, HIDDEN
