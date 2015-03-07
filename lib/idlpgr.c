@@ -26,10 +26,6 @@
 // Point Grey support
 #include "C/FlyCapture2_C.h"
 
-fc2Context context;
-fc2PGRGuid guid;
-fc2Image   image;
-
 // Error messages
 static IDL_MSG_DEF msg_arr[] =
   {
