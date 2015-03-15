@@ -281,7 +281,6 @@ function DGGhwPointGrey::Init, camera = _camera
   self.context = idlpgr_CreateContext()
   camera = idlpgr_GetCameraFromIndex(self.context, camera)
   idlpgr_Connect, self.context, camera
-;  self.writeregister, '601'XUL, 1UL
   self.startcapture
   self.image =  idlpgr_CreateImage(self.context)
 
@@ -322,7 +321,6 @@ pro DGGhwPointGrey::Cleanup
   COMPILE_OPT IDL2, HIDDEN
 
   self.stopcapture
-;  self.writeregister, '610'XUL, 0UL
   idlpgr_DestroyContext, self.context
   idlpgr_DestroyImage, self.image
 end
@@ -338,7 +336,6 @@ pro DGGhwPointGrey__define
   COMPILE_OPT IDL2
 
   struct = {DGGhwPointGrey, $
-;            inherits IDL_Object, $
             context: 0ULL,  $
             image: bytarr(48),  $
             properties: obj_new() $
