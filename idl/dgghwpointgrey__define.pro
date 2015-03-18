@@ -187,11 +187,13 @@ pro DGGhwPointGrey::SetProperty, hflip = hflip, $
               value <= info.absmax
               prop.absvalue = value
            endif else begin
+              prop.abscontrol = 0L
               value = long(scope_varfetch(name, /ref_extra))
               value >= info.min
               value <= info.max
               prop.valueA = value
            endelse
+           prop.automanualmode = 0L
            idlpgr_SetProperty, self.context, prop
         endif
      endforeach
