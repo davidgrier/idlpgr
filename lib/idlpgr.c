@@ -289,6 +289,8 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   fc2Context context;
   fc2Image *image;
   IDL_MEMINT ndims, dims[3];
+  IDL_VPTR idl_image;
+  UCHAR *pd;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
@@ -313,9 +315,13 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
     dims[1] = image->cols;
     dims[2] = image->rows;
   }
-  
-  return IDL_ImportArray(ndims, dims, IDL_TYP_BYTE,
-			 (UCHAR *) image->pData, NULL, NULL);
+
+  pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dims,
+				   IDL_ARR_INI_NOP, &idl_image);
+  memcpy(pd, image->pData, image->rows*image->stride);
+  return idl_image;
+  //return IDL_ImportArray(ndims, dims, IDL_TYP_BYTE,
+  //			 (UCHAR *) image->pData, NULL, NULL);
 }
 
 //
