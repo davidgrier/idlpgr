@@ -32,6 +32,7 @@
 ;    [ GS] FRAME_RATE
 ;    [ GS] TEMPERATURE
 ;
+;    [ G ] GRAYSCALE: If set, camera provides grayscale images
 ;    [ G ] CAMERAINFO: structure of camera information
 ;    [ GS] POWER: If set, camera is powered.
 ;    [ GS] HFLIP: If set, flip image horizontally
@@ -63,6 +64,7 @@
 ; MODIFICATION HISTORY:
 ; 07/21/2013 Written by David G. Grier, New York University
 ; 03/05/2015 DGG Revised for DLM interface.
+; 03/17/2015 DGG Rudimentary support for grayscale.
 ;
 ; Copyright (c) 2013-2015 David G. Grier
 ;-
@@ -185,7 +187,7 @@ pro DGGhwPointGrey::SetProperty, hflip = hflip, $
               value <= info.absmax
               prop.absvalue = value
            endif else begin
-              value = long(scope_varfectch(name, /ref_extra))
+              value = long(scope_varfetch(name, /ref_extra))
               value >= info.min
               value <= info.max
               prop.valueA = value
@@ -207,6 +209,7 @@ end
 ; DGGhwPointGrey::GetProperty
 ;
 pro DGGhwPointGrey::GetProperty, properties = properties, $
+                                 grayscale  = grayscale,  $
                                  camerainfo = camerainfo, $
                                  hflip      = hflip,      $
                                  _ref_extra = propertylist
@@ -232,6 +235,9 @@ pro DGGhwPointGrey::GetProperty, properties = properties, $
 
   if arg_present(properties) then $
      properties = self.properties.keys()
+
+  if arg_present(grayscale) then $
+     grayscale = self.grayscale
 
   if arg_present(camerainfo) then $
      camerainfo = idlpgr_GetCameraInfo(self.context)
@@ -305,6 +311,9 @@ function DGGhwPointGrey::Init, camera = _camera
   indexes = indgen(n_elements(properties))
   self.properties = orderedhash(properties, indexes)
 
+  info = idlpgr_GetCameraInfo(self.context)
+  self.grayscale = ~info.iscolorcamera
+
   a = idlpgr_RetrieveBuffer(self.context, self.image)
 
   return, 1B
@@ -337,7 +346,8 @@ pro DGGhwPointGrey__define
 
   struct = {DGGhwPointGrey, $
             context: 0ULL,  $
-            image: bytarr(48),  $
+            image: bytarr(48), $
+            grayscale: 1L, $
             properties: obj_new() $
            }
 end
