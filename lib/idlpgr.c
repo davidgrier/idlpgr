@@ -317,7 +317,7 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   }
 
   pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dims,
-				   IDL_ARR_INI_NOP, &idl_image);
+  				   IDL_ARR_INI_NOP, &idl_image);
   memcpy(pd, image->pData, image->rows*image->stride);
   return idl_image;
   //return IDL_ImportArray(ndims, dims, IDL_TYP_BYTE,
