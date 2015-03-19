@@ -150,10 +150,10 @@ pro DGGhwPointGrey::ControlProperty, property, $
      prop.onoff = keyword_set(off)
 
   if isa(auto, /number, /scalar) && info.autosupported then $
-     prop.autoManualMode = ~keyword_set(auto)
+     prop.autoManualMode = keyword_set(auto)
 
   if isa(manual, /number, /scalar) && info.autosupported then $
-     prop.autoManualMode = keyword_set(manual)
+     prop.autoManualMode = ~keyword_set(manual)
 
   if isa(onepush, /number, /scalar) &&  info.onepushsupported then $
      print, 'not implemented yet'
