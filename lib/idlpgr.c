@@ -40,7 +40,7 @@ static IDL_MSG_BLOCK msgs;
 //
 // idlpgr_CreateContext
 //
-IDL_VPTR idlpgr_CreateContext(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_CreateContext(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -56,7 +56,7 @@ IDL_VPTR idlpgr_CreateContext(int argc, IDL_VPTR argv[])
 //
 // idlpgr_DestroyContext
 //
-void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -71,7 +71,7 @@ void idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
 //
 // idlpgr_GetNumOfCameras
 //
-IDL_VPTR idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -90,7 +90,7 @@ IDL_VPTR idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
 //
 // idlpgr_GetCameraFromIndex
 //
-IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -122,7 +122,7 @@ IDL_VPTR idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
 //
 // idlpgr_Connect
 //
-void idlpgr_Connect(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_Connect(int argc, IDL_VPTR argv[])
  {
   fc2Error error;
   fc2Context context;
@@ -151,7 +151,7 @@ void idlpgr_Connect(int argc, IDL_VPTR argv[])
 //
 // Returns a subset of the fc2CameraInfo structure
 //
-IDL_VPTR idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -203,7 +203,7 @@ IDL_VPTR idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
 //
 // idlpgr_StartCapture
 //
-void idlpgr_StartCapture(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_StartCapture(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -219,7 +219,7 @@ void idlpgr_StartCapture(int argc, IDL_VPTR argv[])
 //
 // idlpgr_StopCapture
 //
-void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_StopCapture(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -235,7 +235,7 @@ void idlpgr_StopCapture(int argc, IDL_VPTR argv[])
 //
 // idlpgr_CreateImage
 //
-IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -262,7 +262,7 @@ IDL_VPTR idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 //
 // idlpgr_DestroyImage
 //
-void idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Image *image;
@@ -283,7 +283,7 @@ void idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 //
 // idlpgr_RetrieveBuffer
 //
-IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -329,7 +329,7 @@ IDL_VPTR idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
 //
 // Read contents of specified register
 //
-IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -351,7 +351,7 @@ IDL_VPTR idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
 //
 // Write unsigned integer to specified register
 //
-void idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -374,7 +374,7 @@ void idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 //
 // Reference: FlyCapture2Defs_C.h
 //
-IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -427,7 +427,7 @@ IDL_VPTR idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 //
 // Reference: FlyCapture2Defs_C.h
 //
-IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
+IDL_VPTR IDL_CDECL idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -473,7 +473,7 @@ IDL_VPTR idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 //
 // Reference: FlyCapture2Defs_C.h
 //
-void idlpgr_SetProperty(int argc, IDL_VPTR argv[])
+void IDL_CDECL idlpgr_SetProperty(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
@@ -506,32 +506,32 @@ int IDL_Load (void)
   int nmsgs, nfcns, npros;
 
   static IDL_SYSFUN_DEF2 function_addr[] = {
-    { idlpgr_CreateContext, "IDLPGR_CREATECONTEXT", 0, 0, 0, 0 },
-    { idlpgr_GetNumOfCameras, "IDLPGR_GETNUMOFCAMERAS", 1, 1, 0, 0 },
+    { idlpgr_CreateContext,      "IDLPGR_CREATECONTEXT",      0, 0, 0, 0 },
+    { idlpgr_GetNumOfCameras,    "IDLPGR_GETNUMOFCAMERAS",    1, 1, 0, 0 },
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
-    { idlpgr_GetCameraInfo, "IDLPGR_GETCAMERAINFO", 1, 1, 0, 0 },
-    { idlpgr_CreateImage, "IDLPGR_CREATEIMAGE", 1, 1, 0, 0 },
-    { idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
-    { idlpgr_ReadRegister, "IDLPGR_READREGISTER", 2, 2, 0, 0 },
-    { idlpgr_GetPropertyInfo, "IDLPGR_GETPROPERTYINFO", 2, 2, 0, 0 },
-    { idlpgr_GetProperty, "IDLPGR_GETPROPERTY", 2, 2, 0, 0 },
+    { idlpgr_GetCameraInfo,      "IDLPGR_GETCAMERAINFO",      1, 1, 0, 0 },
+    { idlpgr_CreateImage,        "IDLPGR_CREATEIMAGE",        1, 1, 0, 0 },
+    { idlpgr_RetrieveBuffer,     "IDLPGR_RETRIEVEBUFFER",     2, 2, 0, 0 },
+    { idlpgr_ReadRegister,       "IDLPGR_READREGISTER",       2, 2, 0, 0 },
+    { idlpgr_GetPropertyInfo,    "IDLPGR_GETPROPERTYINFO",    2, 2, 0, 0 },
+    { idlpgr_GetProperty,        "IDLPGR_GETPROPERTY",        2, 2, 0, 0 },
   };
 
   static IDL_SYSFUN_DEF2 procedure_addr[] = {
     { (IDL_SYSRTN_GENERIC)
       idlpgr_DestroyContext, "IDLPGR_DESTROYCONTEXT", 1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_Connect, "IDLPGR_CONNECT", 2, 2, 0, 0 },
+      idlpgr_Connect,        "IDLPGR_CONNECT",        2, 2, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_StartCapture, "IDLPGR_STARTCAPTURE", 1, 1, 0, 0 },
+      idlpgr_StartCapture,   "IDLPGR_STARTCAPTURE",   1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_StopCapture, "IDLPGR_STOPCAPTURE", 1, 1, 0, 0 },
+      idlpgr_StopCapture,    "IDLPGR_STOPCAPTURE",    1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_DestroyImage, "IDLPGR_DESTROYIMAGE", 1, 1, 0, 0 },
+      idlpgr_DestroyImage,   "IDLPGR_DESTROYIMAGE",   1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_WriteRegister, "IDLPGR_WRITEREGISTER", 3, 3, 0, 0 },
+      idlpgr_WriteRegister,  "IDLPGR_WRITEREGISTER",  3, 3, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
-      idlpgr_SetProperty, "IDLPGR_SETPROPERTY", 2, 2, 0, 0 },
+      idlpgr_SetProperty,    "IDLPGR_SETPROPERTY",    2, 2, 0, 0 },
   };
 
   nmsgs = IDL_CARRAY_ELTS(msg_arr);
