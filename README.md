@@ -5,6 +5,9 @@
 IDL is the Interactive Data Language, and is a product of
 [Exelis Visual Information Solutions](http://www.exelisvis.com)
 
+[Point Grey](http://www.ptgrey.com) manufactures digital cameras,
+including scientific video cameras.
+
 *idlpgr* is licensed under the GPLv3.
 
 ## What it does
