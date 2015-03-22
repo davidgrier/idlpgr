@@ -543,7 +543,7 @@ int IDL_Load (void)
   status = IDL_SysRtnAdd(function_addr, TRUE, nfcns);
 
   npros = IDL_CARRAY_ELTS(procedure_addr);
-  status &= IDL_SysRtnAdd(procedure_addr, FALSE, npros);
+  status |= IDL_SysRtnAdd(procedure_addr, FALSE, npros);
 
   return status;
 }
