@@ -8,7 +8,8 @@ IDL is the Interactive Data Language, and is a product of
 [Point Grey](http://www.ptgrey.com) manufactures digital cameras,
 including scientific video cameras.
 
-*idlpgr* is licensed under the GPLv3.
+*idlpgr* is licensed under the
+[GPLv3](http://www.gnu.org/licenses/licenses.html#GPL).
 
 ## What it does
 
