@@ -41,7 +41,7 @@ Follow their instructions to install for your platform.
 3. `make`
 4. `make install`
 
-Installation requires super-user priviledges.
+Installation requires super-user privileges.
 
 ## UNINSTALLATION
 
