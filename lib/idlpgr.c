@@ -33,6 +33,8 @@ static IDL_MSG_DEF msg_arr[] =
     { "M_IDLPGR_ERROR", "%NError: %s" },
 #define M_IDLPGR_ERRORCODE -1
     { "M_IDLPGR_ERRORCODE", "%NError: %s Code: %0X" },
+#define M_IDLPGR_ERRORSTRING -2
+    { "M_IDLPGR_ERRORSTRING", "%NError: %s: %s" },
   };
 
 static IDL_MSG_BLOCK msgs;
@@ -47,8 +49,9 @@ IDL_VPTR IDL_CDECL idlpgr_CreateContext(int argc, IDL_VPTR argv[])
 
   error = fc2CreateContext(&context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP, 
-			 "Could not create context.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP, 
+			 "Could not create context",
+			 fc2ErrorToDescription(error));
 
   return IDL_GettmpULong64((IDL_ULONG64) context);
 }
@@ -64,8 +67,9 @@ void IDL_CDECL idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
   error = fc2DestroyContext(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not destroy specified context.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not destroy specified context",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -81,8 +85,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
 
   error = fc2GetNumOfCameras(context, &ncameras);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not count cameras.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not count cameras",
+			 fc2ErrorToDescription(error));
   
   return IDL_GettmpLong(ncameras);
 }
@@ -107,8 +112,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
 
   error = fc2GetCameraFromIndex(context, camera, &guid);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not acquire specified camera.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not acquire specified camera",
+			 fc2ErrorToDescription(error));
 
   // transfer camera guid to IDL as a vector of ULONG values
   pd = (IDL_ULONG *) 
@@ -142,8 +148,9 @@ void IDL_CDECL idlpgr_Connect(int argc, IDL_VPTR argv[])
     guid.value[i] = pd[i];
   error = fc2Connect(context, &guid);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not connect camera to context.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not connect camera to context",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -165,8 +172,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
 
   error = fc2GetCameraInfo(context, &camerainfo);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not read camera info.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not read camera info",
+			 fc2ErrorToDescription(error));
 
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "SERIALNUMBER",     0, (void *) IDL_TYP_ULONG },
@@ -212,8 +220,9 @@ void IDL_CDECL idlpgr_StartCapture(int argc, IDL_VPTR argv[])
   
   error = fc2StartCapture(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not start capture.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not start capture",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -228,8 +237,9 @@ void IDL_CDECL idlpgr_StopCapture(int argc, IDL_VPTR argv[])
   
   error = fc2StopCapture(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not stop capture.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not stop capture",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -248,8 +258,9 @@ IDL_VPTR IDL_CDECL idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 
   error = fc2CreateImage(&image);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could create image.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could create image",
+			 fc2ErrorToDescription(error));
 
   dim = (IDL_MEMINT) sizeof(image);
   
@@ -276,8 +287,9 @@ void IDL_CDECL idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 
   error = fc2DestroyImage(image);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not destroy image.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not destroy image",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -302,8 +314,9 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   
   error = fc2RetrieveBuffer(context, image);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not retrieve image buffer.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not retrieve image buffer",
+			 fc2ErrorToDescription(error));
 
   if (image->cols == image->stride) {
     ndims = 2;
@@ -340,8 +353,9 @@ IDL_VPTR IDL_CDECL idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
   
   error = fc2ReadRegister(context, address, &value);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not read from specified register.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not read from specified register",
+			 fc2ErrorToDescription(error));
   
   return IDL_GettmpULong((IDL_ULONG) value);
 }
@@ -363,8 +377,9 @@ void IDL_CDECL idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 
   error = fc2WriteRegister(context, address, value);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not write value to specified register.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not write value to specified register",
+			 fc2ErrorToDescription(error));
 }
 
 //
@@ -391,8 +406,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 
   error = fc2GetPropertyInfo(context, &info);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not get requested property information.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not get requested property information",
+			 fc2ErrorToDescription(error));
 
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "TYPE",             0, (void *) IDL_TYP_LONG },
@@ -443,8 +459,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 
   error = fc2GetProperty(context, &property);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not get requested property.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not get requested property",
+			 fc2ErrorToDescription(error));
   
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "TYPE",           0, (void *) IDL_TYP_LONG },
@@ -493,8 +510,9 @@ void IDL_CDECL idlpgr_SetProperty(int argc, IDL_VPTR argv[])
 
   error = fc2SetProperty(context, &property);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
-			 "Could not set requested property.", error);
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+			 "Could not set requested property",
+			 fc2ErrorToDescription(error));
 }
 
 //
