@@ -118,7 +118,7 @@ pro DGGhwPointGrey::Reset
 
   COMPILE_OPT IDL2, HIDDEN
 
-  self.WriteRegister, '0'XUL, '1'XUL
+  self.WriteRegister, self.ReadRegister('0'XUL) or 1
 end
 
 ;;;;;
