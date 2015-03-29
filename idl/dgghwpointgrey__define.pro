@@ -59,12 +59,16 @@
 ;    WriteRegister, address, value
 ;        Write value to the register at the specified address
 ;
+;    Reset
+;        Reset camera to factory default settings
+;
 ;    Read(): acquire next image from camera and return the data
 ;
 ; MODIFICATION HISTORY:
 ; 07/21/2013 Written by David G. Grier, New York University
 ; 03/05/2015 DGG Revised for DLM interface.
 ; 03/17/2015 DGG Rudimentary support for grayscale.
+; 03/28/2015 DGG Implemented Reset method.
 ;
 ; Copyright (c) 2013-2015 David G. Grier
 ;-
@@ -102,6 +106,19 @@ pro DGGhwPointGrey::StopCapture
   COMPILE_OPT IDL2, HIDDEN
 
   idlpgr_StopCapture, self.context
+end
+
+;;;;;
+;
+; DGGhwPointGrew::Reset
+;
+; Reset the camera to factory default settings
+;
+pro DGGhwPointGrey::Reset
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  self.WriteRegister, '0'XUL, '1'XUL
 end
 
 ;;;;;
