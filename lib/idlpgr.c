@@ -65,6 +65,7 @@ void IDL_CDECL idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
   fc2Context context;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
+
   error = fc2DestroyContext(context);
   if (error)
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,

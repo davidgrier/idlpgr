@@ -118,7 +118,7 @@ pro DGGhwPointGrey::Reset
 
   COMPILE_OPT IDL2, HIDDEN
 
-  self.WriteRegister, self.ReadRegister('0'XUL) or 1
+  self.WriteRegister, '0'XUL, self.ReadRegister('0'XUL) or 1
 end
 
 ;;;;;
@@ -361,7 +361,7 @@ end
 ;
 pro DGGhwPointGrey__define
 
-  COMPILE_OPT IDL2
+  COMPILE_OPT IDL2, HIDDEN
 
   struct = {DGGhwPointGrey, $
             context: 0ULL,  $
