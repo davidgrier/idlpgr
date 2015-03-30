@@ -334,8 +334,6 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   				   IDL_ARR_INI_NOP, &idl_image);
   memcpy(pd, image->pData, image->rows*image->stride);
   return idl_image;
-  //return IDL_ImportArray(ndims, dims, IDL_TYP_BYTE,
-  //			 (UCHAR *) image->pData, NULL, NULL);
 }
 
 //
