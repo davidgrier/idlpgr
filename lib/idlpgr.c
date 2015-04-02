@@ -301,7 +301,7 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   fc2Error error;
   fc2Context context;
   fc2Image *image;
-  IDL_MEMINT ndims, dims[3];
+  IDL_MEMINT ndims, dim[IDL_MAX_ARRAY_DIM];
   IDL_VPTR idl_image;
   UCHAR *pd;
 
@@ -321,16 +321,16 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
 
   if (image->cols == image->stride) {
     ndims = 2;
-    dims[0] = image->cols;
-    dims[1] = image->rows;
+    dim[0] = image->cols;
+    dim[1] = image->rows;
   } else {
     ndims = 3;
-    dims[0] = 3;
-    dims[1] = image->cols;
-    dims[2] = image->rows;
+    dim[0] = 3;
+    dim[1] = image->cols;
+    dim[2] = image->rows;
   }
 
-  pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dims,
+  pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dim,
   				   IDL_ARR_INI_NOP, &idl_image);
   memcpy(pd, image->pData, image->rows*image->stride);
   return idl_image;
