@@ -83,7 +83,24 @@ function DGGhwPointGrey::Read
 
   COMPILE_OPT IDL2, HIDDEN
 
-  return, idlpgr_RetrieveBuffer(self.context, self.image)
+  self.DGGhwPointGrey::Read
+  return, *self._data
+end
+
+;;;;;
+;
+; DGGhwPointGrey::Read
+;
+; Read next video frame from camera into data
+;
+pro DGGhwPointGrey::Read
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
+                                             self.image, $
+                                             *self._data), $
+                       /no_copy)
 end
 
 ;;;;;
@@ -220,7 +237,6 @@ pro DGGhwPointGrey::SetProperty, hflip = hflip, $
      value = '80000000'XUL + (hflip ne 0)
      self.writeregister, '1054'XUL, value
   endif
-
 end
 
 ;;;;;
@@ -333,7 +349,8 @@ function DGGhwPointGrey::Init, camera = _camera
   info = idlpgr_GetCameraInfo(self.context)
   self.grayscale = ~info.iscolorcamera
 
-  a = idlpgr_RetrieveBuffer(self.context, self.image)
+  self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, self.image), $
+                       /no_copy)
 
   return, 1B
 end
@@ -366,6 +383,7 @@ pro DGGhwPointGrey__define
   struct = {DGGhwPointGrey, $
             context: 0ULL,  $
             image: bytarr(48), $
+            _data: ptr_new(), $
             grayscale: 1L, $
             properties: obj_new() $
            }

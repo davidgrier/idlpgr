@@ -49,9 +49,9 @@ IDL_VPTR IDL_CDECL idlpgr_CreateContext(int argc, IDL_VPTR argv[])
 
   error = fc2CreateContext(&context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP, 
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP, 
 			 "Could not create context",
-			 fc2ErrorToDescription(error));
+			 error);
 
   return IDL_GettmpULong64((IDL_ULONG64) context);
 }
@@ -68,9 +68,9 @@ void IDL_CDECL idlpgr_DestroyContext(int argc, IDL_VPTR argv[])
 
   error = fc2DestroyContext(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not destroy specified context",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -86,9 +86,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetNumOfCameras(int argc, IDL_VPTR argv[])
 
   error = fc2GetNumOfCameras(context, &ncameras);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not count cameras",
-			 fc2ErrorToDescription(error));
+			 error);
   
   return IDL_GettmpLong(ncameras);
 }
@@ -113,9 +113,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetCameraFromIndex(int argc, IDL_VPTR argv[])
 
   error = fc2GetCameraFromIndex(context, camera, &guid);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not acquire specified camera",
-			 fc2ErrorToDescription(error));
+			 error);
 
   // transfer camera guid to IDL as a vector of ULONG values
   pd = (IDL_ULONG *) 
@@ -149,9 +149,9 @@ void IDL_CDECL idlpgr_Connect(int argc, IDL_VPTR argv[])
     guid.value[i] = pd[i];
   error = fc2Connect(context, &guid);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not connect camera to context",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -173,9 +173,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetCameraInfo(int argc, IDL_VPTR argv[])
 
   error = fc2GetCameraInfo(context, &camerainfo);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not read camera info",
-			 fc2ErrorToDescription(error));
+			 error);
 
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "SERIALNUMBER",     0, (void *) IDL_TYP_ULONG },
@@ -221,9 +221,9 @@ void IDL_CDECL idlpgr_StartCapture(int argc, IDL_VPTR argv[])
   
   error = fc2StartCapture(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not start capture",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -238,9 +238,9 @@ void IDL_CDECL idlpgr_StopCapture(int argc, IDL_VPTR argv[])
   
   error = fc2StopCapture(context);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not stop capture",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -259,13 +259,13 @@ IDL_VPTR IDL_CDECL idlpgr_CreateImage(int argc, IDL_VPTR argv[])
 
   error = fc2CreateImage(&image);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could create image",
-			 fc2ErrorToDescription(error));
+			 error);
 
   dim = (IDL_MEMINT) sizeof(image);
   
-  pd = IDL_MakeTempVector(IDL_TYP_BYTE, dim, IDL_ARR_INI_ZERO, &idl_image);
+  pd = IDL_MakeTempVector(IDL_TYP_BYTE, dim, IDL_ARR_INI_NOP, &idl_image);
   memcpy(pd, (unsigned char *) &image, dim);
 
   return idl_image;
@@ -288,9 +288,9 @@ void IDL_CDECL idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 
   error = fc2DestroyImage(image);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not destroy image",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -315,9 +315,9 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
   
   error = fc2RetrieveBuffer(context, image);
   if (error) 
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not retrieve image buffer",
-			 fc2ErrorToDescription(error));
+			 error);
 
   if (image->cols == image->stride) {
     ndims = 2;
@@ -330,9 +330,17 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
     dim[2] = image->rows;
   }
 
-  pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dim,
-  				   IDL_ARR_INI_NOP, &idl_image);
+  if ((argc == 3) &&
+      (argv[2]->flags & IDL_V_ARR) &&
+      (argv[2]->value.arr->arr_len == image->stride*image->rows)){
+    idl_image = argv[2];
+    pd = idl_image->value.arr->data;
+  } else {
+    pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dim,
+				     IDL_ARR_INI_NOP, &idl_image);
+  }
   memcpy(pd, image->pData, image->rows*image->stride);
+
   return idl_image;
 }
 
@@ -352,9 +360,9 @@ IDL_VPTR IDL_CDECL idlpgr_ReadRegister(int argc, IDL_VPTR argv[])
   
   error = fc2ReadRegister(context, address, &value);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not read from specified register",
-			 fc2ErrorToDescription(error));
+			 error);
   
   return IDL_GettmpULong((IDL_ULONG) value);
 }
@@ -376,9 +384,9 @@ void IDL_CDECL idlpgr_WriteRegister(int argc, IDL_VPTR argv[])
 
   error = fc2WriteRegister(context, address, value);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not write value to specified register",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -405,9 +413,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetPropertyInfo(int argc, IDL_VPTR argv[])
 
   error = fc2GetPropertyInfo(context, &info);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not get requested property information",
-			 fc2ErrorToDescription(error));
+			 error);
 
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "TYPE",             0, (void *) IDL_TYP_LONG },
@@ -458,9 +466,9 @@ IDL_VPTR IDL_CDECL idlpgr_GetProperty(int argc, IDL_VPTR argv[])
 
   error = fc2GetProperty(context, &property);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not get requested property",
-			 fc2ErrorToDescription(error));
+			 error);
   
   static IDL_STRUCT_TAG_DEF tags[] = {
     { "TYPE",           0, (void *) IDL_TYP_LONG },
@@ -509,9 +517,9 @@ void IDL_CDECL idlpgr_SetProperty(int argc, IDL_VPTR argv[])
 
   error = fc2SetProperty(context, &property);
   if (error)
-    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORSTRING, IDL_MSG_LONGJMP,
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not set requested property",
-			 fc2ErrorToDescription(error));
+			 error);
 }
 
 //
@@ -528,7 +536,7 @@ int IDL_Load (void)
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
     { idlpgr_GetCameraInfo,      "IDLPGR_GETCAMERAINFO",      1, 1, 0, 0 },
     { idlpgr_CreateImage,        "IDLPGR_CREATEIMAGE",        1, 1, 0, 0 },
-    { idlpgr_RetrieveBuffer,     "IDLPGR_RETRIEVEBUFFER",     2, 2, 0, 0 },
+    { idlpgr_RetrieveBuffer,     "IDLPGR_RETRIEVEBUFFER",     2, 3, 0, 0 },
     { idlpgr_ReadRegister,       "IDLPGR_READREGISTER",       2, 2, 0, 0 },
     { idlpgr_GetPropertyInfo,    "IDLPGR_GETPROPERTYINFO",    2, 2, 0, 0 },
     { idlpgr_GetProperty,        "IDLPGR_GETPROPERTY",        2, 2, 0, 0 },
