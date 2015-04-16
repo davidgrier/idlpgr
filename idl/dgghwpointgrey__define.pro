@@ -97,10 +97,15 @@ pro DGGhwPointGrey::Read
 
   COMPILE_OPT IDL2, HIDDEN
 
-  ;self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
-  ;                                           self.image, $
-  ;                                           *self._data), $
-  ;                     /no_copy)
+  ;;; NOTE: The following lines lead to system lockups after
+  ;;; a few minutes of operation.  Even though this looks
+  ;;; correct, it does not work
+  ; ptr_free, self._data
+  ; self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
+  ;                                            self.image, $
+  ;                                            *self._data), $
+  ;                      /no_copy)
+  ;;; NOTE: Copying the data seems to yield stable operation. 
   *self._data = idlpgr_RetrieveBuffer(self.context, $
                                      self.image, $
                                      temporary(*self._data))
