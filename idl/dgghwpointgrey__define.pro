@@ -97,10 +97,13 @@ pro DGGhwPointGrey::Read
 
   COMPILE_OPT IDL2, HIDDEN
 
-  self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
-                                             self.image, $
-                                             *self._data), $
-                       /no_copy)
+  ;self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
+  ;                                           self.image, $
+  ;                                           *self._data), $
+  ;                     /no_copy)
+  *self._data = idlpgr_RetrieveBuffer(self.context, $
+                                     self.image, $
+                                     temporary(*self._data))
 end
 
 ;;;;;
