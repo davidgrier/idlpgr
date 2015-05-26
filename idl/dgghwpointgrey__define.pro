@@ -69,6 +69,7 @@
 ; 03/05/2015 DGG Revised for DLM interface.
 ; 03/17/2015 DGG Rudimentary support for grayscale.
 ; 03/28/2015 DGG Implemented Reset method.
+; 05/26/2015 DGG Updated image retrieval code to minimize pointer creation.
 ;
 ; Copyright (c) 2013-2015 David G. Grier
 ;-
@@ -106,9 +107,11 @@ pro DGGhwPointGrey::Read
   ;                                            *self._data), $
   ;                      /no_copy)
   ;;; NOTE: Copying the data seems to yield stable operation. 
-  *self._data = idlpgr_RetrieveBuffer(self.context, $
-                                     self.image, $
-                                     temporary(*self._data))
+  ;*self._data = idlpgr_RetrieveBuffer(self.context, $
+  ;                                   self.image, $
+                                ;                                   temporary(*self._data))
+  idlpgr_RetrieveBuffer, self.context, self.image
+  idlpgr_GetImage, self.image, *self._data
 end
 
 ;;;;;
@@ -357,8 +360,9 @@ function DGGhwPointGrey::Init, camera = _camera
   info = idlpgr_GetCameraInfo(self.context)
   self.grayscale = ~info.iscolorcamera
 
-  self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, self.image), $
-                       /no_copy)
+  idlpgr_RetrieveBuffer, self.context, self.image
+  data = idlpgr_AllocateImage(self.image)
+  self._data = ptr_new(data, /no_copy)
 
   return, 1B
 end

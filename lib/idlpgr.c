@@ -12,6 +12,7 @@
 // 01/24/2014 DGG Implemented read_register.
 // 01/26/2014 DGG Implemented write_register, read_property & write_property
 // 03/02/2015 DGG Better integration of FlyCap2 API with IDL.
+// 05/26/2015 DGG Separate image retrieval from IDL storage.
 //
 // Copyright (c) 2013-2015 David G. Grier
 //
@@ -296,14 +297,13 @@ void IDL_CDECL idlpgr_DestroyImage(int argc, IDL_VPTR argv[])
 //
 // idlpgr_RetrieveBuffer
 //
-IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
+// Transfer image to Point Grey image buffer.
+//
+void IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
 {
   fc2Error error;
   fc2Context context;
   fc2Image *image;
-  IDL_MEMINT ndims, dim[IDL_MAX_ARRAY_DIM];
-  IDL_VPTR idl_image;
-  UCHAR *pd;
 
   context = (fc2Context) IDL_ULong64Scalar(argv[0]);
 
@@ -318,7 +318,28 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
     IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
 			 "Could not retrieve image buffer",
 			 error);
+}
 
+//
+// idlpgr_AllocateImage
+//
+// Allocate IDL buffer for image data and transfer image.
+// argv[0]: image
+//
+IDL_VPTR IDL_CDECL idlpgr_AllocateImage(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Image *image;
+  IDL_MEMINT ndims, dim[IDL_MAX_ARRAY_DIM];
+  IDL_VPTR idl_image;
+  UCHAR *pd;
+  
+  IDL_ENSURE_ARRAY(argv[0]);
+  if (argv[1]->value.arr->n_elts != sizeof(fc2Image))
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Argument is not a valid image descriptor.");
+  image = (fc2Image *) argv[0]->value.arr->data;
+  
   if (image->cols == image->stride) {
     ndims = 2;
     dim[0] = image->cols;
@@ -330,18 +351,63 @@ IDL_VPTR IDL_CDECL idlpgr_RetrieveBuffer(int argc, IDL_VPTR argv[])
     dim[2] = image->rows;
   }
 
-  if ((argc == 3) &&
-      (argv[2]->flags & IDL_V_ARR) &&
-      (argv[2]->value.arr->arr_len == image->stride*image->rows)){
-    idl_image = argv[2];
-    pd = idl_image->value.arr->data;
-  } else {
-    pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dim,
+  pd = (UCHAR *) IDL_MakeTempArray(IDL_TYP_BYTE, ndims, dim,
 				     IDL_ARR_INI_NOP, &idl_image);
-  }
   memcpy(pd, image->pData, image->rows*image->stride);
 
   return idl_image;
+}
+
+//
+// idlpgr_GetImage
+//
+// Transfer image data to preallocated IDL buffer
+//
+void IDL_CDECL idlpgr_GetImage(int argc, IDL_VPTR argv[])
+{
+  fc2Error error;
+  fc2Image *image;
+  IDL_MEMINT ndims, dim[IDL_MAX_ARRAY_DIM];
+  IDL_VPTR idl_image;
+  UCHAR *pd;
+  
+  IDL_ENSURE_ARRAY(argv[0]);
+  if (argv[1]->value.arr->n_elts != sizeof(fc2Image))
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERROR, IDL_MSG_LONGJMP,
+			 "Argument is not a valid image descriptor.");
+  image = (fc2Image *) argv[0]->value.arr->data;
+  
+  if (image->cols == image->stride) {
+    ndims = 2;
+    dim[0] = image->cols;
+    dim[1] = image->rows;
+  } else {
+    ndims = 3;
+    dim[0] = 3;
+    dim[1] = image->cols;
+    dim[2] = image->rows;
+  }
+  if (image->cols == image->stride) {
+    ndims = 2;
+    dim[0] = image->cols;
+    dim[1] = image->rows;
+  } else {
+    ndims = 3;
+    dim[0] = 3;
+    dim[1] = image->cols;
+    dim[2] = image->rows;
+  }
+
+  if ((argv[1]->flags & IDL_V_ARR) &&
+      (argv[1]->value.arr->arr_len == image->stride*image->rows)){
+    idl_image = argv[1];
+    pd = idl_image->value.arr->data;
+  } else {
+    IDL_MessageFromBlock(msgs, M_IDLPGR_ERRORCODE, IDL_MSG_LONGJMP,
+			 "IDL buffer is not the same size as the image",
+			 error);
+  }
+  memcpy(pd, image->pData, image->rows*image->stride);
 }
 
 //
@@ -536,7 +602,7 @@ int IDL_Load (void)
     { idlpgr_GetCameraFromIndex, "IDLPGR_GETCAMERAFROMINDEX", 1, 2, 0, 0 },
     { idlpgr_GetCameraInfo,      "IDLPGR_GETCAMERAINFO",      1, 1, 0, 0 },
     { idlpgr_CreateImage,        "IDLPGR_CREATEIMAGE",        1, 1, 0, 0 },
-    { idlpgr_RetrieveBuffer,     "IDLPGR_RETRIEVEBUFFER",     2, 3, 0, 0 },
+    { idlpgr_AllocateImage,      "IDLPGR_ALLOCATEIMAGE",      1, 1, 0, 0 },
     { idlpgr_ReadRegister,       "IDLPGR_READREGISTER",       2, 2, 0, 0 },
     { idlpgr_GetPropertyInfo,    "IDLPGR_GETPROPERTYINFO",    2, 2, 0, 0 },
     { idlpgr_GetProperty,        "IDLPGR_GETPROPERTY",        2, 2, 0, 0 },
@@ -553,6 +619,10 @@ int IDL_Load (void)
       idlpgr_StopCapture,    "IDLPGR_STOPCAPTURE",    1, 1, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_DestroyImage,   "IDLPGR_DESTROYIMAGE",   1, 1, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_RetrieveBuffer, "IDLPGR_RETRIEVEBUFFER", 2, 2, 0, 0 },
+    { (IDL_SYSRTN_GENERIC)
+      idlpgr_GetImage,       "IDLPGR_GETIMAGE",       2, 2, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
       idlpgr_WriteRegister,  "IDLPGR_WRITEREGISTER",  3, 3, 0, 0 },
     { (IDL_SYSRTN_GENERIC)
