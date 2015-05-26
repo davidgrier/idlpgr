@@ -98,18 +98,6 @@ pro DGGhwPointGrey::Read
 
   COMPILE_OPT IDL2, HIDDEN
 
-  ;;; NOTE: The following lines lead to system lockups after
-  ;;; a few minutes of operation.  Even though this looks
-  ;;; correct, it does not work
-  ; ptr_free, self._data
-  ; self._data = ptr_new(idlpgr_RetrieveBuffer(self.context, $
-  ;                                            self.image, $
-  ;                                            *self._data), $
-  ;                      /no_copy)
-  ;;; NOTE: Copying the data seems to yield stable operation. 
-  ;*self._data = idlpgr_RetrieveBuffer(self.context, $
-  ;                                   self.image, $
-                                ;                                   temporary(*self._data))
   idlpgr_RetrieveBuffer, self.context, self.image
   idlpgr_GetImage, self.image, *self._data
 end
@@ -322,11 +310,11 @@ function DGGhwPointGrey::Init, camera = _camera
 
   COMPILE_OPT IDL2, HIDDEN
 
-  catch, error
-  if (error ne 0L) then begin
-     catch, /cancel
-     return, 0B
-  endif
+ ; catch, error
+ ; if (error ne 0L) then begin
+ ;    catch, /cancel
+ ;    return, 0B
+ ; endif
 
   camera = isa(_camera, /number, /scalar) ? long(_camera) : 0L
 
@@ -334,7 +322,6 @@ function DGGhwPointGrey::Init, camera = _camera
   camera = idlpgr_GetCameraFromIndex(self.context, camera)
   idlpgr_Connect, self.context, camera
   self.startcapture
-  self.image =  idlpgr_CreateImage(self.context)
 
   properties = ['brightness',    $
                 'auto_exposure', $
@@ -360,6 +347,7 @@ function DGGhwPointGrey::Init, camera = _camera
   info = idlpgr_GetCameraInfo(self.context)
   self.grayscale = ~info.iscolorcamera
 
+  self.image =  idlpgr_CreateImage()
   idlpgr_RetrieveBuffer, self.context, self.image
   data = idlpgr_AllocateImage(self.image)
   self._data = ptr_new(data, /no_copy)
@@ -394,7 +382,7 @@ pro DGGhwPointGrey__define
 
   struct = {DGGhwPointGrey, $
             context: 0ULL,  $
-            image: bytarr(48), $
+            image: 0ULL, $
             _data: ptr_new(), $
             grayscale: 1L, $
             properties: obj_new() $
