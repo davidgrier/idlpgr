@@ -19,6 +19,7 @@ clean:
 install: all
 	sudo $(INSTALL) -d $(DESTINATION)
 	sudo $(INSTALL) -m 644 $(FILES) $(DESTINATION)
+	sudo ldconfig
 
 uninstall:
 	sudo rm $(DESTINATION)/$(FILES)
