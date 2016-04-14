@@ -3,7 +3,7 @@
 **IDL interface for Point Grey cameras**
 
 IDL is the Interactive Data Language, and is a product of
-[Exelis Visual Information Solutions](http://www.exelisvis.com)
+[Harris Geospatial Solutions](http://www.harrisgeospatial.com/)
 
 [Point Grey](http://www.ptgrey.com) manufactures digital cameras,
 including scientific video cameras.
@@ -29,7 +29,7 @@ This package is written and maintained by David G. Grier
 
 ## INSTALLATION
 
-### Install the FlyCapture2 API
+### Optional: Install the FlyCapture2 API
 FlyCapture2 is available from the
 [PointGrey download site](http://www.ptgrey.com/support/downloads).
 Follow their instructions to install for your platform.
