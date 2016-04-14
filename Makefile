@@ -3,10 +3,10 @@
 #
 # Modification History
 # 07/21/2013 Written by David G. Grier, New York University
+# 05/26/2015 DGG Updated for DLM version
 #
-# Copyright (c) 2013 David G. Grier
+# Copyright (c) 2013-2015 David G. Grier
 #
-LIB = idlpgr.so
 IDLDIR = /usr/local/IDL
 PRODIR = $(IDLDIR)/idlpgr
 LIBDIR = $(PRODIR)
@@ -18,6 +18,7 @@ all:
 install: all
 	make -C idl install DESTINATION=$(PRODIR)
 	make -C lib install DESTINATION=$(LIBDIR)
+	make -C flycapture2 install DESTINATION=/usr/local/lib
 
 uninstall:
 	make -C idl uninstall DESTINATION=$(PRODIR)
